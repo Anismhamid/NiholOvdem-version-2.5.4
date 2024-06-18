@@ -1,6 +1,5 @@
 # application image
 
-![Alt text](WM.png)
 
 # Description
 
