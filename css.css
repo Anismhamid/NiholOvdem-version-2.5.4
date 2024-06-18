@@ -1,0 +1,31 @@
+primary {
+    color: #386fcf;
+}
+
+secondary {
+    color: #adb5bd;
+}
+
+success {
+    color: #02b875;
+}
+
+info {
+    color: #17a2b8;
+}
+
+warning {
+    color: #f0ad4e;
+}
+
+danger {
+    color: #d9534f;
+}
+
+light {
+    color: #f8f9fa;
+}
+
+dark {
+    color: #343a40;
+}
