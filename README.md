@@ -12,13 +12,32 @@ This project is a Workers Manager System (WMS) developed to efficiently manage e
 - [Contact Information](#contact-information)
 - [Author](#author)
 
-## Features
+## Application features
 
-- **Employee Management Window**: Allows users to view employee workdays, salary deductions, and calculate salaries. Users can input employee data such as name, ID number, joining date, and daily wage. The window also includes search, update, and export functionalities to Excel and Word.
 
-- **Salary Deduction Window**: Enables users to record salary deductions for employees, including details such as name, ID number, date range, and payment date.
+- *Manage workers easily and effectively*
 
-- **Interactive Map Window**: Displays an interactive map showing various business locations. Users can search for specific addresses or select locations on the map. It also offers export options to Excel and Word.
+Users can fully manage employee data through an easy-to-use interface that supports several core functions
+
+Add, view, update, and delete records: Users can fully manage employee records, including adding new data, viewing existing details, updating information, and deleting records when needed.
+
+Accurate tracking of payroll data: Users are able to record employee payroll deductions on a regular basis, including details such as employee name, ID number, date period, and payment date.
+
+
+- *Use modern technologies and a secure database*
+
+Using MySQL and SQLAlchemy: Employee data is stored and managed using a MySQL database, with SQLAlchemy being used to facilitate communication with the database and ensure data integrity and ease of querying.
+
+
+- *API support for interacting with data*
+
+RESTful API: The application provides API endpoints for interacting with employee data, enabling simple and secure access, updating, and deletion of data over HTTP.
+Provide flexibility and integration
+Flexibility in installation and deployment: The application can be deployed on multiple platforms like Windows, macOS, and Linux by compiling it into executable files using tools like PyInstaller or cx_Freeze, which facilitates the usage and deployment process for different users.
+Modern technology to improve performance
+Using Flask and Python: The application is built using Flask, a lightweight and flexible Python framework, providing highly efficient performance and easy development and maintenance.
+
+
 
 ## File Structure
 
