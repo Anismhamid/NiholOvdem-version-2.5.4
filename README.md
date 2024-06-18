@@ -1,3 +1,7 @@
+# application image
+
+![Alt text](WM.png)
+
 # Description
 
 This project is a Workers Manager System (WMS) developed to efficiently manage employee data, track salary payments, and facilitate searching and updating records. It consists of multiple windows, each serving different functionalities to streamline the management process effectively.
