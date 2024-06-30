@@ -133,8 +133,6 @@ class MainScreen:
 #================================== | |  תפריט   | | ===================================
 
 # | תמונות תפריט |
-        img = PhotoImage(file='gallery\\open1.png')
-        img2 = PhotoImage(file='gallery\\close.png')
 #----------------------------------------------------
 
 # | תפריט |
@@ -142,7 +140,7 @@ class MainScreen:
             point = 0.900
 
             def toggle_menu_dis():
-                tuggle_btn.configure(image=img)
+                tuggle_btn.configure(bootstyle="dark")
                 tuggle_btn.configure(command=toggle_menu)
                 tuggle_btn.configure(bootstyle="primary")
                 for i in range(200):
@@ -157,9 +155,8 @@ class MainScreen:
 
             laBel(tuggle_menu_frame,'תפריט',primary,light)
 
-            
+            tuggle_btn.configure(bootstyle="dark")
             tuggle_btn.configure(command=toggle_menu_dis)
-            tuggle_btn.configure(image=img2)
             tuggle_btn.configure(bootstyle="primary")
 
             # | כפתור שקיפות |
@@ -175,7 +172,7 @@ class MainScreen:
             cale_tk.pack(ipadx=10)
 
         # | כפתור תפריט |
-        tuggle_btn = cttk.Button(Header,width=5,bootstyle="primary", image=img, compound='left', command=toggle_menu)
+        tuggle_btn = cttk.Button(Header,width=5,bootstyle="dark", compound='left', command=toggle_menu)
         tuggle_btn.place(x=0,y=0)
 
 
