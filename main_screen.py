@@ -92,6 +92,7 @@ class MainScreen:
 # #=====================================
 
 
+
 #-----------== | פונקצית שקיפות |
         def allpha(value):
             global alpha
@@ -123,7 +124,6 @@ class MainScreen:
         def kaftor(text,command,bgcolor,master,side='top'):
             buttons = ctk.CTkButton(master=master,border_color='black',text_color='black',font=(mainFont,17,'bold'),hover_color=success,corner_radius=0,fg_color=bgcolor,text=text,command=command,cursor='hand2')
             buttons.pack(side=side,pady=5,ipady=8,ipadx=20)
-
 #=====================================================================================================================
 
 
@@ -283,12 +283,13 @@ class MainScreen:
                         ))
                 else:
                     # If the request fails
-                    messagebox.showerror('Error', f'Failed to fetch data. Status code: {response.status_code}')
+                    toastErrorCacher('Error', f'Failed to fetch data. Status code: {response.status_code}')
                     print(response.status_code)
             except requests.exceptions.RequestException as e:
                 print(e)
-                messagebox.showerror('Error', f'An error occurred: {e}')
+                toastErrorCacher('Error', f'An error occurred: {e}')
         get_api()
+
 
 
 # | פונקצית שליחת הנתונים | 
@@ -317,27 +318,25 @@ class MainScreen:
                 response = requests.post(url, json=data, headers=headers)
 
                 if response.status_code == 201:
-                    # عرض رسالة نجاح إذا كان الرد 201 Created
-                    messagebox.showinfo('Success', 'Data added successfully')
+                    toastErrorCacher('הכנסת עובד','העובד הוקלט בהצלחה')
                 else:
                     # التعامل مع أخطاء محددة إذا فشلت عملية الإضافة
                     if response.status_code == 400:
-                        messagebox.showerror('Error', 'Bad request. Please check your data.')
+                        toastErrorCacher('שגיאה', 'בקשה גרועה אנא בדוק את הנתונים שלך')
                     elif response.status_code == 500:
-                        messagebox.showerror('Error', 'Internal server error. Please try again later.')
+                        toastErrorCacher('שגיאה', 'שגיאת שרת פנימית בבקשה נסה שוב מאוחר יותר')
                     else:
-                        messagebox.showerror('Error', f'Failed to add data. Status code: {response.status_code}')
+                        toastErrorCacher('שגיאה', f'הוספת נתונים נכשלה. קוד סטטוס: {response.status_code}')
 
             except requests.exceptions.RequestException as e:
                 # التعامل مع الأخطاء العامة في الطلبات (مثل مشاكل الشبكة)
-                messagebox.showerror('Error', f'An error occurred: {e}')
+                toastErrorCacher('שגיאה', f'אירעה שגיאה: {e}')
             except Exception as e:
                 # التعامل مع أي استثناءات غير متوقعة
-                messagebox.showerror('Error', f'An unexpected error occurred: {e}')
+                toastErrorCacher('שגיאה', f'אירעה שגיאה בלתי צפויה: {e}')
 
 # | פונקצית עדכון הנתונים |==
         def update_api():
-            # data stored in variables
             data = {
                 'Rowid': Row_Number_var.get(),
                 'hours': WORKERS_Hours_Var.get(),
@@ -351,10 +350,10 @@ class MainScreen:
                 'phone': WORKERS_PHONE_var.get(),
                 'workername': WORKERS_NAME_var.get(),
             }
-            # Set mainContent-Type header to application/json
+
             headers = {'mainContent-Type': 'application/json'}
 
-            # API endpoint URL
+
             url = 'http://127.0.0.1:5000/update'
             
 
@@ -362,22 +361,22 @@ class MainScreen:
                 # Send PUT request to the API endpoint
                 response = requests.put(url, json=data,headers=headers)
                 if response.status_code == 200:
-                    messagebox.showinfo('Success', 'Data updated successfully')
+                    toastErrorCacher('עדכון נתוני עובד','הנתונים של העובד עודכנו בהצלחה')
                 else:
                     print(response)
                     # Handle specific error when updating data fails
                     if response.status_code == 400:
-                        messagebox.showerror('Error', 'Bad request. Please check your data.')
+                        toastErrorCacher('שגיאה', 'בקשה גרועה אנא בדוק את הנתונים שלך')
                     elif response.status_code == 500:
-                        messagebox.showerror('Error', 'Internal server error. Please try again later.')
+                        toastErrorCacher('שגיאה', 'שגיאת שרת פנימית. בבקשה נסה שוב מאוחר יותר')
                     else:
-                        messagebox.showerror('Error', f'Failed to update data. Status code: {response.status_code}')
+                        toastErrorCacher('שגיאה', f'נכשל בעדכון הנתונים. קוד סטטוס: {response.status_code}')
             except requests.exceptions.RequestException as e:
-                # Handle general request exceptions (e.g., network issues)
-                messagebox.showerror('Error', f'An error occurred: {e}')
+
+                toastErrorCacher('שגיאה', f'אירעה שגיאה: {e}')
             except Exception as e:
-                # Handle any other unexpected exceptions
-                messagebox.showerror('Error', f'An unexpected error occurred: {e}')
+
+                toastErrorCacher('שגיאה','אירעה שגיאה בלתי צפויה: {e}')
 
 
 # | פונקצית מחיקת נתונים |==
@@ -387,17 +386,17 @@ class MainScreen:
                 worker_id = delete_var.get()
                 response = requests.delete(f'http://127.0.0.1:5000/delete/{worker_id}')
                 if response.status_code == 200:
-                    messagebox.showinfo('Success', 'Data deleted successfully')
+                    toastErrorCacher('מחיקת עובד', 'הנתונים נמחקו בהצלחה')
                 elif response.status_code == 404:
-                    messagebox.showerror('Error', 'Worker not found')
+                    toastErrorCacher('שגיאה', 'העובד לא נמצא')
                 else:
-                    messagebox.showerror('Error', f'Failed to delete data. Status code: {response.status_code}')
+                    toastErrorCacher('שגיאה', 'מחיקת הנתונים נכשלה. קוד סטטוס: {response.status_code}')
             except requests.exceptions.RequestException as e:
                 # Handle general request exceptions (e.g., network issues)
-                messagebox.showerror('Error', f'An error occurred: {e}')
+                toastErrorCacher('שגיאה', 'אירעה שגיאה: {e}')
             except Exception as e:
                 # Handle any other unexpected exceptions
-                messagebox.showerror('Error', f'An unexpected error occurred: {e}')
+                toastErrorCacher('שגיאה', f'אירעה שגיאה בלתי צפויה: {e}')
 
 
 # | פונקצית ניכוי כל שדות כל  |==
@@ -467,7 +466,7 @@ class MainScreen:
                         WORKERS_PHONE_var.set(row[9])
                         WORKERS_NAME_var.set(row[10])
             except pymysql.err.IntegrityError as e:
-                messagebox.showerror('err', e)
+                toastErrorCacher('err', e)
             finally:
                 pass
         workers_tuple.bind("<ButtonRelease-1>", get_cursor_function)
@@ -588,7 +587,7 @@ class MainScreen:
 
 #-------------- | תאריך | ------------------ 
         def update_date():
-            current_date = datetime.now().strftime('%d/%m/%Y')
+            current_date = datetime.now().date()
             global date_entry
             date_entry = cttk.Entry(Header3, font=(mainFont, 14, 'normal'),justify=CENTER, state='normal')
             date_entry.insert(0, current_date)
@@ -701,11 +700,11 @@ class MainScreen:
                     if workbook:
                         messagebox.showinfo('הצלחה', f"הקובץ נשמר ב: {file_path}")
             except FileNotFoundError:
-                messagebox.showerror('שגיאה', 'הקובץ לא נמצא.')
+                toastErrorCacher('שגיאה', 'הקובץ לא נמצא.')
             except PermissionError:
-                messagebox.showerror('שגיאה', 'הקובץ לא ניתן לכתיבה. נא לסגור אותו ולנסות שוב.')
+                toastErrorCacher('שגיאה', 'הקובץ לא ניתן לכתיבה. נא לסגור אותו ולנסות שוב.')
             except Exception as e:
-                messagebox.showerror('שגיאה', f'אירעה שגיאה: {str(e)}')
+                toastErrorCacher('שגיאה', f'אירעה שגיאה: {str(e)}')
 
 
 
@@ -968,7 +967,7 @@ class MainScreen:
                         search_ttk['values'] = [''] + worker_names
 
                     except pymysql.err.DatabaseError as e:
-                        messagebox.showerror("no Interner Error",f"אירעה שגיאה בעת חיבור למסד הנתונים {e}")
+                        toastErrorCacher("no Interner Error",f"אירעה שגיאה בעת חיבור למסד הנתונים {e}")
                     finally:
                         pass
                 get_workers_names_Analysis()
@@ -990,7 +989,7 @@ class MainScreen:
                             messagebox.showinfo(f"ERROR","אין שורות המכילות את שם העובד")
                             
                     except pymysql.err.DatabaseError as e:
-                        messagebox.showerror("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
+                        toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                     finally:
                         pass
 
@@ -1015,7 +1014,7 @@ class MainScreen:
                             
                     except pymysql.err.DatabaseError as e:
                         # Handling database errors
-                        messagebox.showerror("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
+                        toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                     finally:
                         pass
 
@@ -1034,7 +1033,7 @@ class MainScreen:
                             messagebox.showinfo(f"ERROR","אין שורות המכילות את שם העובד")
                             
                     except pymysql.err.DatabaseError as e:
-                        messagebox.showerror("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
+                        toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                         pass
 
                 def Company():
@@ -1069,7 +1068,7 @@ class MainScreen:
                             messagebox.showinfo("ERROR", "אין נתונים להצגה")
                                         
                     except pymysql.err.DatabaseError as e:
-                        messagebox.showerror("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
+                        toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                         return None
 
                 def hours():
@@ -1086,7 +1085,7 @@ class MainScreen:
                         else:
                             messagebox.showinfo('אין תוצאות', 'לא נמצאו נתונים עבור העובד המבוקש')
                     except Exception as e:
-                        messagebox.showerror('לא ניתן להתחבר לשרת MySQL', f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}")
+                        toastErrorCacher('לא ניתן להתחבר לשרת MySQL', f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}")
                     finally:
                         pass
 

@@ -87,16 +87,16 @@ def update_api():
         Row_id = data.get('Rowid')
         worker = Workers.query.filter_by(Rowid=Row_id).first()  # Corrected column name
         if worker:
-            worker.hours = data.get('hours')
-            worker.taken = data.get('taken')
-            worker.wage = data.get('wage')
-            worker.address = data.get('address')
-            worker.managername = data.get('managername')
-            worker.compname = data.get('compname')
+            worker.hours = data.get('hours', worker.hours)
+            worker.taken = data.get('taken', worker.taken)
+            worker.wage = data.get('wage', worker.wage)
+            worker.address = data.get('address', worker.address)
+            worker.managername = data.get('managername', worker.managername)
+            worker.compname = data.get('compname', worker.compname)
             # worker.date = data.get('date')
-            worker.worker_id = data.get('worker_id')  # Corrected assignment of worker_id
-            worker.phone = data.get('phone')
-            worker.workername = data.get('workername')
+            worker.worker_id = data.get('worker_id', worker.worker_id)  # Corrected assignment of worker_id
+            worker.phone = data.get('phone', worker.phone)
+            worker.workername = data.get('workername', worker.workername)
 
             # Save the changes to the database
             db.session.commit()
@@ -124,7 +124,6 @@ def delete_api(Rowid):
         else:
             return jsonify({'error': 'Worker not found'}), 404
     except Exception as e:
-        print(e,'hhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 
