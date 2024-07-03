@@ -59,15 +59,25 @@ The application can be published on various platforms such as Windows, macOS, an
 
 - Python 3.x
 - Tkinter
+- customtkinter
+- ttkbootstrap
+- webbrowser
+- requests
 - pymysql
+- logging
+- flask
+- flask_sqlalchemy
+- sqlalchemy
+- datetime
 - openpyxl
 - docx
 - pptx
 - reportlab
 
+
 ## Contact Information
 
-For inquiries or support, please contact [Anis Mahamid] at [email@example.com].
+For inquiries or support, please contact Anis Mahamid at anesmhamed1@gamil.com
 
 ## Author
 
