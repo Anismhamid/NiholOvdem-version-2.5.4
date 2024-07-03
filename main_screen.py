@@ -25,7 +25,7 @@ mainFont = font='Heebo'
 
 #----------- database conniction -------------
 hostname1 = 'localhost'
-porta = 10011
+porta = 10017
 username1 ='root'
 passwd1 = 'root'
 database1='local'
@@ -58,10 +58,9 @@ class MainScreen:
     def __init__(self):
         super().__init__()
         self.new_root = ctk.CTk()
-        self.new_root.geometry('996x780+320+20')
+        self.new_root.geometry('996x760+320+20')
         self.new_root.title('ניהול עוהדים, Develobed by °Anis Zkaria Mhamid°')
         self.new_root.config(bd=0)
-        self.new_root.iconbitmap('C:\\NiholOvdem-version-2.5.4\\safety.ico')
         self.new_root.minsize(True,True)
         self.new_root.configure(fg_color=primary)
 
@@ -285,8 +284,9 @@ class MainScreen:
                 else:
                     # If the request fails
                     messagebox.showerror('Error', f'Failed to fetch data. Status code: {response.status_code}')
+                    print(response.status_code)
             except requests.exceptions.RequestException as e:
-                # If any exceptions occur during the order
+                print(e)
                 messagebox.showerror('Error', f'An error occurred: {e}')
         get_api()
 
@@ -709,14 +709,7 @@ class MainScreen:
 
 
 
-#       
-        def mainContentView():
-            f8.pack_forget()
-            f7.pack(fill='both')
 
-        def tloshimSectionView():
-            f7.pack_forget()
-            f8.pack(fill='both')
 # ==================================================================
 
 
@@ -731,9 +724,7 @@ class MainScreen:
                                 text=text,
                                 command=command)
             _top.pack(side=side,padx='20')
-        topButtons(text='תלושים',command=tloshimSectionView,side=LEFT)
         topButtons(text='הסתרת רשימה',command=toggle_treeview,side=RIGHT)
-        topButtons(text='ראשי',command=mainContentView,side=RIGHT)
 
 
 
@@ -1136,406 +1127,6 @@ class MainScreen:
             iidentry = cttk.Entry(rowIdFrame,background=dark,foreground=danger,font=(mainFont,10,'bold'),textvariable=Row_Number_var,state='disabled',justify='center')
             iidentry.pack(pady=0,side='bottom')
         mainContent()
-
-
-
-#============================= | |  tloshim Area   | | ====================================
-
-        f8 = Canvas(self.new_root, bg=dark, bd=0, highlightthickness=0)
-
-
-        def tloshimSection():
-            header = Frame(f8,height=25,bg=primary)
-            header.pack(fill='x')
-
-            treeFrame = Frame(header,bg=primary,bd=0,border=0)
-            treeFrame.pack(side='top',fill='both')
-
-
-
-
-            t = ttk.Treeview(treeFrame,columns=( 'a','b','c','d','e'))
-            t.pack(fill='both')
-            t['show']='headings'
-            t.heading('e' , text='שם עובד')
-            t.heading('d' , text='ת.ז')
-            t.heading('c' , text='מתאריך')
-            t.heading('b' , text='עד תאריך')
-            t.heading('a' , text='תאריך קבלה')
-
-
-
-            t.column('a',width=110,)
-            t.column('b',width=110,)
-            t.column('c',width=110,)
-            t.column('d',width=110,)
-            t.column('e',width=110,)
-
-
-            WORKER_NAME_var = StringVar()
-            WORKER_ID_var = StringVar()
-            FROMS_var = StringVar()
-            INTOS_var = StringVar()
-            DATE_var = StringVar()
-
-            def get_cursor(event):
-                    cursor_row = t.focus()
-                    try:    
-                        if cursor_row:
-                            mainContents = t.item(cursor_row)
-                            row = mainContents['values']
-                            if row:
-                                DATE_var.set(row[0])
-                                INTOS_var.set(row[1])
-                                FROMS_var.set(row[2])
-                                WORKER_ID_var.set(row[3])
-                                WORKER_NAME_var.set(row[4])
-                                if not row:
-                                    print('error')
-                    except pymysql.err.IntegrityError as e:
-                        print('err', e)
-            t.bind("<ButtonRelease-1>", get_cursor)
-
-#===============================================     חיפוש     ================================================
-            
-            searchframe = Frame(f8,bg=primary,bd=0)
-            searchframe.pack(fill='both')
-            
-
-            search = ttk.Combobox(searchframe, state='readonly',width=15, font=( mainFont,12 ), justify='center')
-            search.pack(side='left', padx=5)
-            
-    # ---------------- داله البحث في جدول تلوشيم ----------------
-
-            def Search_func():
-                try:
-                    con = pymysql.connect(host=hostname1, port=porta, user=username1, passwd=passwd1, database=database1)
-                    cor = con.cursor()
-                    search = search.get()
-
-                    cor.execute(f"SELECT * FROM tloshim WHERE workername = '{search}'")
-                    quary = cor.fetchall()
-
-                    if len(quary):
-                        t.delete(*t.get_children())
-                        for row in quary:
-                            t.insert('', END, values=row)
-                        t.xview_moveto(1.0)
-                        con.commit()
-                    else:
-                        messagebox.showinfo("החיפוש שלך לא תאם", "לא נמצאו עובדים התואמים לקריטריוני החיפוש שלך")
-                except pymysql.Error as e:
-                    messagebox.showerror("שגיאה", "אירעה שגיאה בעת בדיקת מסד הנתונים")
-                finally:
-                    pass
-
-
-
-            def get_workers_names():
-                try:
-                    connection = pymysql.connect(host=hostname1, user=username1, passwd=passwd1, port=porta, database=database1)
-                    cursor = connection.cursor()
-
-                    cursor.execute("SELECT DISTINCT workername FROM tloshim ORDER BY workername ASC;")
-
-                    rows = cursor.fetchall()
-
-                    global worker_names
-                    worker_names = [row[0] for row in rows]
-                
-                    search['values'] = worker_names
-
-                except:
-                    pass
-            get_workers_names()
-
-
-
-
-            #--------------------| שדות כלט חיפוש | כפתור חיפוש| ----------------------
-            def kaftorim():
-
-                getdata_button = ctk.CTkButton(master=searchframe,height=30, text="חפש",font=('arial UI',10,'bold'),fg_color='white',text_color='#8BD279', command=Search_func)
-                getdata_button.pack(side='left',padx=10,ipadx=10)
-
-                getdata_button.bind('<Enter>', lambda e: getdata_button.configure(fg_color='black',text_color='white'))
-                getdata_button.bind('<Leave>', lambda e: getdata_button.configure(fg_color='white',text_color='#8BD279'))
-
-                #-------------------- | שדות כלט חיפוש| ----------------------
-
-                serLabel = ctk.CTkLabel(master=searchframe,fg_color='#8BD279',text_color='black',text='חיפוש',font=('arial',16,'bold'))
-                serLabel.pack(side=LEFT,padx=10)
-                
-                global search2
-                Val = [valuee for valuee in trns3.keys()]
-                search2 = ttk.Combobox(master=searchframe,background='#8BD279',font=('arial UI',10,'bold'),state='readonly',values=Val)
-                search2.pack(side='right',padx=5)
-
-
-                global Ee1
-                Ee1 = Entry(master=searchframe,justify='center',font=('arial UI',10,'bold'),bd=0,highlightbackground='#8BD279',highlightthickness=2,highlightcolor='yellow')
-                Ee1.pack(side='right',padx=20)
-                
-                Ee1.bind('<Enter>', lambda e: Ee1.config(highlightbackground='yellow'))
-                Ee1.bind('<Leave>', lambda e: Ee1.config(highlightbackground='#8BD279'))
-            kaftorim()
-    #-------------------------------------------------------------------------------
-
-
-
-
-    #-----------------------------
-            
-            frd = Frame(f8,bg=warning,bd=0,highlightbackground='#194D33',highlightthickness=1)
-            frd.pack(fill='both')
-
-
-            ffr = Frame(frd,bg=danger,bd=3,relief='sunken')
-            ffr.pack(side='right',ipadx=5,ipady=1800)
-
-    #-------------------------------------------------------------------------------
-
-
-
-
-    #------------------------------- | שדות | ------------------------------------------------------
-
-            def shemot(text):
-                #--------------------- שם עובד-----------------------------
-                Lb_NAME = Label(ffr,text=text,bg=danger,fg=light,font=(mainFont,10))
-                Lb_NAME.pack()
-
-            def shodot(textvariable):
-                Er_NAME = ctk.CTkEntry(ffr,border_width=0,justify='center',placeholder_text_color=light,textvariable=textvariable)
-                Er_NAME.pack()
-
-            shemot(text='שם עובד')
-
-            shodot(textvariable=WORKER_NAME_var)
-
-            shemot(text='ת.ז')
-
-            shodot(textvariable=WORKER_ID_var)
-
-            shemot(text='מתאריך')
-
-            shodot(textvariable=FROMS_var)
-
-            shemot(text='עד תאריך')
-
-            shodot(textvariable=INTOS_var)
-
-            shemot(text='תאריך קבלה')
-
-            shodot(textvariable=DATE_var)
-
-
-
-
-
-
-
-
-
-
-
-    #-------------------------------------------------------------------------------
-    #
-    #
-    #
-    #-------------- | פונקציית מחיקת שדות | -----------------
-
-            def Entrys_empty():
-                WORKER_NAME_var.set('')
-                WORKER_ID_var.set('')
-                FROMS_var.set('')
-                INTOS_var.set('')
-                DATE_var.set('')
-
-    #-------------------------------------------------------------------------------
-    #
-    #
-    #
-    # ---------------------  3 داله الاتصال مع قاعدة البيانات صفحه تلوشيم ------------------------------
-
-            def coco():
-                try:    
-                    con = pymysql.connect(host=hostname1,port=porta, user=username1, passwd=passwd1, database=database1)
-                    cor2 = con.cursor()
-                    cor2.execute("INSERT INTO tloshim VALUES(%s,%s,%s,%s,%s)", (
-                            DATE_var.get(),
-                            INTOS_var.get(),
-                            FROMS_var.get(),
-                            WORKER_ID_var.get(),
-                            WORKER_NAME_var.get(),
-                                    ))
-                    con.commit()
-                    con.close()
-                    Entrys_empty()
-                    fetch_all2()
-                except pymysql.err.IntegrityError as e:
-                    messagebox.showerror("Error:", e)
-                        
-                
-                    #--------------------- 3  داله جلب البيانات من قاعدة البيانات صفحه تلوشيم ------------------------------
-
-
-    #-------------- | פונקציית קבלת נתונים | -----------------
-
-            def fetch_all2():
-                try:
-                    con = pymysql.connect(host=hostname1,port=porta, user=username1, passwd=passwd1, database=database1)
-                    cor = con.cursor()
-                    cor.execute('SELECT * FROM tloshim')
-                    rows = cor.fetchall()
-                    if len(rows) != 0:
-                        t.delete(*t.get_children())
-                        for row in rows:
-                            t.insert('', END, values=row)
-                    con.commit()
-                    con.close()
-                except pymysql.err.IntegrityError as e:
-                    print("Error:", e)
-            fetch_all2()        
-
-    #----------------------------------------------------------------------------------
-    #
-    #
-    #
-    #--------------- | כפתור הוספה | ---------------
-
-
-
-            Add_tloshim = ctk.CTkButton(frd, text="הוספה",font=('arial UI',17,'bold'),fg_color='orange',text_color='black',width=180,height=60,command=coco)
-            Add_tloshim.pack(side='bottom')
-
-            Add_tloshim.bind('<Enter>', lambda e: Add_tloshim.configure(fg_color='black',text_color='white'))
-            Add_tloshim.bind('<Leave>', lambda e: Add_tloshim.configure(fg_color='orange',text_color='black'))
-
-    #----------------------------------------------------------------------------------
-    #
-    #
-    #
-    #-------------- | Exel פונקציית הדפס לקובץ | -----------------
-
-            def print_treeview():
-                try:
-                    file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel Files", "*.xlsx")])
-                    if file_path:
-                        workbook = openpyxl.Workbook()
-                        sheet = workbook.active
-                        sheet.sheet_view.rightToLeft = True
-
-                        columns = t["columns"]
-                        column_headers = [t.heading(column)["text"] for column in columns]
-
-                        column_headers.reverse()
-
-                        sheet.append(column_headers)
-
-                        items = t.get_children()
-
-                        for row_idx, item in enumerate(items, start=2):
-                            values = [t.item(item, "values")[columns.index(column)] for column in columns]
-
-                            values.reverse()
-
-                            for col_idx, value in enumerate(values, start=1):
-                                sheet.cell(row=row_idx, column=col_idx, value=value)
-
-                        for col_idx, column_header in enumerate(column_headers, start=1):
-                            sheet.cell(row=1, column=col_idx, value=column_header)
-                            sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = len(column_header) + 2
-
-                        workbook.save(file_path)
-                        if workbook:
-                            messagebox.showinfo('הצלחה', f"הקובץ נשמר ב: {file_path}")
-                except:
-                    messagebox.showerror('Error', 'The file should not be open.')
-
-            print_button = ctk.CTkButton(frd,hover_color='#09795f',fg_color='green',height=60,text_color='white',text='Exel לקובץ הדפס ',command=print_treeview)
-            print_button.pack(side='left')
-    #----------------------------------------------------------------------------------  
-    #
-    #
-    #
-    #-------------- | Docx פונקציית הדפס לקובץ | -----------------
-
-
-            def print_to_word():
-                file_path = filedialog.asksaveasfilename(defaultextension=".docx", filetypes=[("Word Files", "*.docx")])
-                if file_path:
-                    document = Document()
-                    
-                    title = document.add_heading('מידע על העובד\n', level=1)
-                    title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-                        
-                    table_data = []
-                    column_names = [t.heading(column)["text"] for column in t["columns"]]
-
-                    table_data.append(column_names)
-                        
-                    for item in t.get_children():
-                        item_values = [t.item(item, "values")[i] for i in range(len(t["columns"]))]
-
-                        table_data.append(item_values)
-                        
-                    table = document.add_table(rows=len(table_data), cols=len(column_names))
-                    for row_idx, row_data in enumerate(table_data):
-                        for col_idx, cell_data in enumerate(row_data):
-                            cell = table.cell(row_idx, col_idx)
-                            cell.text = str(cell_data)
-                            cell.paragraphs[0].alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-                            for paragraph in cell.paragraphs:
-                                for run in paragraph.runs:
-                                    run.font.size = Pt(10)
-                    document.save(file_path)
-                    messagebox.showinfo('הפעולה הושלמה בהצלחה', f"{file_path} הקובץ נשמר ב: ")
-                    fetch_all2()
-
-    #------------------ | כפתור הדפסה docx | ---------------------
-                    
-            word_button = ctk.CTkButton(frd,hover_color='#09795f',width=150,height=60,fg_color='#2db4b3',text_color='white', text='Docx לקובץ הדפס ', command=print_to_word)
-            word_button.pack(side='right')
-
-    #----------------------------------------------------------------------------------
-    #
-    #
-    #
-    #-------------- | כפתור רענון | -----------------
-            
-            refresh = ctk.CTkButton(frd,font=('arial UI',12,'bold'),hover_color='#141414',text_color='white',text='רענון טבלה',width=30,height=25,fg_color='#0eae88',cursor='hand1', command=fetch_all2)
-            refresh.pack(side='top')
-
-
-
-
-    #----------------------------------------------------------------------------------
-    #
-            def update():
-                try:
-                    connect = pymysql.connect(host=hostname1,port=porta, user=username1, passwd=passwd1, database=database1)
-                    cor = connect.cursor()
-                    cor.execute(" UPDATE tloshim SET `takendate`=%s, `todate`=%s, `fromdate`=%s , `id`=%s  WHERE  `workername`=%s", (
-                        DATE_var.get(),
-                        INTOS_var.get(),
-                        FROMS_var.get(),
-                        WORKER_ID_var.get(),
-                        WORKER_NAME_var.get()
-                        ))
-                    connect.commit()
-                    if connect != 0:
-                        messagebox.showinfo('בוצע', 'ערוך בהצלחה')
-                        fetch_all2()
-                except pymysql.Error as e:
-                    messagebox.showerror(f"אירעה שגיאה: {e}")
-                finally:
-                    if connect:
-                        connect.close()
-
-            refresh = ctk.CTkButton(frd,font=('arial UI',20,'bold'),hover_color='red',text_color='white',text='עדכון',width=30,height=25,fg_color='#0eae88',cursor='hand1', command=update)
-            refresh.pack(side='top')
-        tloshimSection()
 
 
         self.new_root.mainloop()

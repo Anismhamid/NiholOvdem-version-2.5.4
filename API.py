@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 app.logger.setLevel(logging.ERROR)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost:10011/local'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost:10017/local'
 db = SQLAlchemy(app)
 
 class Workers(db.Model):
@@ -27,9 +27,10 @@ class Workers(db.Model):
 @app.route('/get', methods=['GET'])
 def get_api():
     try:
-        # Query all records from the Workers table
-        workers = Workers.query.order_by(Workers.workername).all()
-        # Serialize the data to JSON
+        # Query all records from Workers table and order by workername
+        workers_list = Workers.query.order_by(Workers.workername).all()
+
+        # Serialize queried data into JSON format
         data = [{
             'Rowid': worker.Rowid,
             'hours': worker.hours,
@@ -42,13 +43,18 @@ def get_api():
             'worker_id': worker.worker_id,
             'phone': worker.phone,
             'workername': worker.workername,
-        } for worker in workers]
+        } for worker in workers_list]
 
-        # Return the data as JSON
         return jsonify(data)
-    except Exception as e:
-        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
+    except SQLAlchemyError as e:
+        # Handle SQLAlchemy errors
+        db.session.rollback()
+        return jsonify({'error': f'SQLAlchemy error: {str(e)}'}), 500
+
+    except Exception as e:
+        # Handle other unexpected errors
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 @app.route('/post', methods=['POST'])
 def post_api():
@@ -118,8 +124,9 @@ def delete_api(Rowid):
         else:
             return jsonify({'error': 'Worker not found'}), 404
     except Exception as e:
+        print(e,'hhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False,host='0.0.0.0',port=5000)
