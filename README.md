@@ -44,12 +44,8 @@ Using Flask and Python: The application is built using Flask, a lightweight and 
 
 ## File Structure
 
-- **main.py**: Main Python file containing the application's logic.
-- **database.py**: Handles database operations.
-- **gui.py**: Defines the graphical user interface elements.
-- **mapScreen.py**: Implements the interactive map functionality.
-- **advanced.py**: Manages advanced features such as exporting data to Excel and Word.
-- **customtkinter.py**: Customizes the appearance of Tkinter widgets.
+- **main_Screen.py**: Main Python file containing the application's logic.
+- **API.py**: Handles database operations.
 
 ## Publishing
 
