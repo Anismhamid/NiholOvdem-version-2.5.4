@@ -41,6 +41,7 @@ danger = '#C1292E'
 light = '#f8f9fa'
 dark = '#343a40'
 Button_Color = '#2F97C1'
+darkBlue ='#0077b6'
 #--------- | translate | --------------
 trns3 = {
     'שם עובד' : 'workername',
@@ -107,18 +108,18 @@ class MainScreen:
 
 # ============= | |  Header   | | ===================================
 
-        Header = ctk.CTkFrame(self.new_root,height=29,fg_color='#2E4057')
+        Header = ctk.CTkFrame(self.new_root,height=29,fg_color=primary)
         Header.pack(fill='x',pady=4)
         Header.pack_propagate(False)
 
-        Header3 = ctk.CTkFrame(self.new_root,fg_color='#2E4057')
+        Header3 = ctk.CTkFrame(self.new_root,fg_color=primary)
         Header3.pack(fill='both')
 
         # main label | ======
         def laBel(master,text,background,foreground,side='top'):
             welcome_to_my_app =cttk.Label(master=master,text=text,background=background, foreground=foreground,font=(mainFont,16,'bold'))
             welcome_to_my_app.pack(side=side)
-        laBel(Header,'ניהול עובדים' ,primary,light)
+        laBel(Header,'ניהול עובדים' ,primary,success)
 
         # main Button  | | ==========
         def kaftor(text,command,bgcolor,master,side='top'):
@@ -596,7 +597,9 @@ class MainScreen:
         def update_date():
             current_date = datetime.now().date()
             global date_entry
-            date_entry = cttk.Entry(Header3, font=(mainFont, 14, 'normal'),justify=CENTER, state='normal')
+            date_entry = Entry(Header3, font=(mainFont, 15, 'bold'),justify=CENTER, state='normal')
+            date_entry.configure(bg=primary)
+            date_entry.configure(fg=light)
             date_entry.insert(0, current_date)
             date_entry.pack(side='left',padx=0)
             WORKERS_DATE_var.set(current_date)
@@ -615,8 +618,10 @@ class MainScreen:
             Header3.after(1000, update_time) # |שדה שעון |
         date_entry2 = cttk.Entry(Header3,
                                 justify=CENTER,
-                                font=(mainFont, 14, 'normal'),
+                                font=(mainFont, 15, 'bold'),
                                 state='normal')
+        date_entry2.configure(foreground=danger)
+        
         date_entry2.pack(side='right')
         update_time()
 
@@ -742,17 +747,19 @@ class MainScreen:
 
 #                         | פרים חישוב | חיצוני  |
         fram_heshov = Frame(self.new_root)
+        
         fram_heshov.pack(anchor='w',fill='x',pady=0,ipady=0)
 #----------------------------------------------------
 
 #                         | פרים חישוב פנימי  |
         fram_heshov2 = Frame(fram_heshov)
+        fram_heshov2.configure(bg=primary)
         fram_heshov2.pack(anchor='s',fill='x',pady=(0,0))
 #----------------------------------------------------
 
 #                        | בחירת שם לחישוב |
         search2 = ttk.Combobox(fram_heshov2, state='readonly',width=15, font=( mainFont,12 ), justify='center')
-        search2.pack(side='left',padx=(0,0),pady=(0,10))
+        search2.pack(side='left',padx=(50,0),pady=(0,10))
 #----------------------------------------------------
 
 #                 | פונקצית ייבואי שימות מדאטאביס 2 |
@@ -772,14 +779,14 @@ class MainScreen:
 
 
 #                         | כפתור חישוב |                
-        calcbtn = ctk.CTkButton(master = fram_heshov2,
+        calcbtn = cttk.Button(master = fram_heshov2,
                                 text='חישוב',
-                                width=80,
-                                fg_color=primary,
-                                hover_color=danger,
-                                font=(mainFont ,18,'bold'),
+                                
+                                bootstyle='info',
+                                # hover_color=success,
+                                # font=(mainFont ,20,'bold'),
                                 command=calculate_sum_function)
-        calcbtn.pack(side=LEFT,padx=50)
+        calcbtn.pack(side=LEFT,padx=(1,50),pady=(0,5),ipady=(5))
 
 
 #==========================================================| |  Search  | |===========================================
@@ -788,16 +795,16 @@ class MainScreen:
         refreshFrame.pack(side='left',padx=10,ipady=0)
 
         # | כפתור הצג הכל| 
-        kaftor(text='רענן טבלה',master=refreshFrame,command=get_api,bgcolor=Button_Color)
+        kaftor(text='הצג הכל',master=refreshFrame,command=get_api,bgcolor=light)
 
 
 
 
 # ------------------- | בחירת שם חיפוש | -----------------------------------
-        laBel(fram_heshov2,'חיפוש',light,dark)
+        laBel(fram_heshov2,'חיפוש',primary,light,side=RIGHT)
 
         search = cttk.Combobox(fram_heshov2,style="Custom.TCombobox", state='readonly',width=15, justify='center')
-        search.pack(side='right', pady=0)
+        search.pack(side='right', pady=(0,5),padx=(0,30))
         search.configure(bootstyle='primary')
         search.bind("<<ComboboxSelected>>", Search_function)
 
@@ -833,7 +840,8 @@ class MainScreen:
         #------------------- |  מחיקה | ---------
 
         def mainContent():
-            deleteframe = cttk.Frame(f7,bootstyle='dark')
+            deleteframe = Frame(f7,)
+            deleteframe.config(bg=primary)
             deleteframe.pack(side=LEFT,fill='y')
 
             laBel(deleteframe,"מחק לפי מ'ס שורה",dark,light)
@@ -912,11 +920,11 @@ class MainScreen:
 
             entry_and_entryTitle(master=bottonFrame,validcommand=(alpha_func, '%P'),valid='focus',textvar=WORKERS_Hours_Var,placehold=str("מ'ס שעות"))
 
-            kaftor(text='תיקון',command=updateandclear,bgcolor=Button_Color,master=bottonFrame)
+            kaftor(text='תיקון',command=updateandclear,bgcolor=warning,master=bottonFrame)
 
-            kaftor(text="Docx הדפסה ל",command=print_to_docx,bgcolor=Button_Color,master=bottonFrame)
+            kaftor(text="Docx הדפסה ל",command=print_to_docx,bgcolor=darkBlue,master=bottonFrame)
 
-            kaftor(text="Exel הדפסה ל",command=print_to_excel,bgcolor=Button_Color,master=bottonFrame)
+            kaftor(text="Exel הדפסה ל",command=print_to_excel,bgcolor=success,master=bottonFrame)
 
             kaftor(text='צור קשר',command=infoo,bgcolor=info,master=bottonFrame)
 
