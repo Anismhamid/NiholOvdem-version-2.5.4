@@ -32,15 +32,15 @@ database1='local'
 
 
 #--------- | colors | --------------
-primary = '#4582ec'
+primary = '#2E4057'
 secondary = '#adb5bd'
 success = '#02b875'
 info = '#17a2b8'
-warning = '#f0ad4e'
-danger = '#d9534f'
+warning = '#F1D302'
+danger = '#C1292E'
 light = '#f8f9fa'
 dark = '#343a40'
-
+Button_Color = '#2F97C1'
 #--------- | translate | --------------
 trns3 = {
     'שם עובד' : 'workername',
@@ -107,22 +107,22 @@ class MainScreen:
 
 # ============= | |  Header   | | ===================================
 
-        Header = cttk.Frame(self.new_root,borderwidth=0,height=29,bootstyle="primary")
+        Header = ctk.CTkFrame(self.new_root,height=29,fg_color='#2E4057')
         Header.pack(fill='x',pady=4)
         Header.pack_propagate(False)
 
-        Header3 = cttk.Frame(self.new_root,borderwidth=0,bootstyle="primary")
+        Header3 = ctk.CTkFrame(self.new_root,fg_color='#2E4057')
         Header3.pack(fill='both')
 
         # main label | ======
         def laBel(master,text,background,foreground,side='top'):
             welcome_to_my_app =cttk.Label(master=master,text=text,background=background, foreground=foreground,font=(mainFont,16,'bold'))
             welcome_to_my_app.pack(side=side)
-        laBel(Header,'ניהול עובדים' ,primary,'white')
+        laBel(Header,'ניהול עובדים' ,primary,light)
 
         # main Button  | | ==========
         def kaftor(text,command,bgcolor,master,side='top'):
-            buttons = ctk.CTkButton(master=master,border_color='black',text_color='black',font=(mainFont,17,'bold'),hover_color=success,corner_radius=0,fg_color=bgcolor,text=text,command=command,cursor='hand2')
+            buttons = ctk.CTkButton(master=master,border_color=dark,text_color=dark,font=(mainFont,17,'bold'),hover_color=success,corner_radius=0,fg_color=bgcolor,text=text,command=command,cursor='hand2')
             buttons.pack(side=side,pady=5,ipady=8,ipadx=20)
 #=====================================================================================================================
 
@@ -133,46 +133,56 @@ class MainScreen:
 
 # | תמונות תפריט |
 #----------------------------------------------------
-
-# | תפריט |
         def toggle_menu():
             point = 0.900
+            window_height = self.new_root.winfo_height() - 200
 
             def toggle_menu_dis():
-                tuggle_btn.configure(bootstyle="dark")
-                tuggle_btn.configure(command=toggle_menu)
-                tuggle_btn.configure(bootstyle="primary")
+                tuggle_btn.configure(fg_color=primary, command=toggle_menu, text='תפריט')
+
                 for i in range(200):
-                    tuggle_menu_frame.place(x=-i-20, y=90, height=window_height, width=20 )
+                    tuggle_menu_frame.place(x=-i - 120, y=90, height=window_height, width=20)
                     tuggle_menu_frame.update()
                     tuggle_menu_frame.after(int(point))
 
-            tuggle_menu_frame = cttk.Frame(master=self.new_root,bootstyle="primary")
-            window_height = self.new_root.winfo_height() - 200
+            tuggle_menu_frame = Frame(master=self.new_root, bg=primary)
             tuggle_menu_frame.place(x=0, y=90, height=window_height, width=200)
-            
 
-            laBel(tuggle_menu_frame,'תפריט',primary,light)
+            # Toggle menu display logic
+            if tuggle_menu_frame.winfo_x() == 0:
+                toggle_menu_dis()
+            else:
+                toggle_menu_dis()
 
-            tuggle_btn.configure(bootstyle="dark")
-            tuggle_btn.configure(command=toggle_menu_dis)
-            tuggle_btn.configure(bootstyle="primary")
+            laBel(tuggle_menu_frame, 'תפריט', primary, light)
 
-            # | כפתור שקיפות |
-            cale_tk = ctk.CTkSlider(tuggle_menu_frame,command=allpha,from_=0,to=1,fg_color=success,bg_color=primary)
+            tuggle_btn.configure(fg_color=primary, command=toggle_menu_dis, text='סגור')
 
-            laBel(tuggle_menu_frame,'שקיפות',primary,dark)
+            # Transparency Slider
+            cale_tk = ctk.CTkSlider(tuggle_menu_frame, command=allpha, from_=0, to=1, fg_color=light, bg_color=primary)
+            laBel(tuggle_menu_frame, 'שקיפות', primary, dark)
 
             for i in range(200):
-                tuggle_menu_frame.place(x=i-200, y=80, height=window_height, width=200)
+                tuggle_menu_frame.place(x=i - 200, y=80, height=window_height, width=200)
                 tuggle_menu_frame.update()
                 tuggle_menu_frame.after(int(point))
-            
-            cale_tk.pack(ipadx=10)
 
-        # | כפתור תפריט |
-        tuggle_btn = cttk.Button(Header,width=5,bootstyle="dark", compound='left', command=toggle_menu)
-        tuggle_btn.place(x=0,y=0)
+            cale_tk.pack(ipadx=10,pady=50)
+
+        # Menu Button
+        tuggle_btn = ctk.CTkButton(
+            Header,
+            width=5,
+            text='תפריט',
+            border_width=1,
+            border_color=danger,
+            font=(mainFont, 20, 'bold'),
+            fg_color=primary,
+            compound='left',
+            command=toggle_menu
+        )
+        tuggle_btn.place(x=0, y=0)
+
 
 
 #========================================================================================
@@ -239,9 +249,9 @@ class MainScreen:
 
 #================ | |  Functions   | | ================================
         
-# | פונקצית תוסט להוצאת השגיאות למשתמש 
+# | פונקצית תוסט להוצאת תוצאות למשתמש 
         def toastErrorCacher(title,message):
-            toast = ToastNotification(title=title,message=message,duration=10000,alert=True)
+            toast = ToastNotification(title=title,message=message,bootstyle='dander',position=(50,50,'ns'),duration=10000,alert=True)
             toast.show_toast()
 
 # | פונקצית הסתרת צץ הנתונים |
@@ -830,21 +840,17 @@ class MainScreen:
 
             laBel(deleteframe,"מחק לפי מ'ס שורה",light,dark)
 
-            En_Delete = ctk.CTkEntry(deleteframe,
+            En_Delete = cttk.Entry(deleteframe,
                                     textvariable=delete_var,
                                     justify='center',
-                                    font=(mainFont ,14),
-                                    border_width=1,
-                                    text_color='white',
-                                    border_color='red',fg_color='red')
+                                    font=(mainFont ,15),
+                                    bootstyle='danger')
             En_Delete.pack(pady=0)
-            En_Delete.bind('<Enter>', lambda e: En_Delete.configure(border_color='#3cff00'))
-            En_Delete.bind('<Leave>', lambda e: En_Delete.configure(border_color='red'))
 
 
             #==  כפתור מחיקה |=
 
-            kaftor('מחיקה',DeleteAndClear_function,danger,deleteframe,side='bottom')
+            kaftor('מחיקה',DeleteAndClear_function,Button_Color,deleteframe,side='bottom')
     #=====================================================================================================================
 
 
@@ -908,15 +914,15 @@ class MainScreen:
 
             entry_and_entryTitle(master=bottonFrame,validcommand=(alpha_func, '%P'),valid='focus',textvar=WORKERS_Hours_Var,placehold=str("מ'ס שעות"))
 
-            kaftor(text='תיקון',command=updateandclear,bgcolor=primary,master=bottonFrame)
+            kaftor(text='תיקון',command=updateandclear,bgcolor=Button_Color,master=bottonFrame)
 
-            kaftor(text="Docx הדפסה ל",command=print_to_docx,bgcolor=warning,master=bottonFrame)
+            kaftor(text="Docx הדפסה ל",command=print_to_docx,bgcolor=Button_Color,master=bottonFrame)
 
-            kaftor(text="Exel הדפסה ל",command=print_to_excel,bgcolor=warning,master=bottonFrame)
+            kaftor(text="Exel הדפסה ל",command=print_to_excel,bgcolor=Button_Color,master=bottonFrame)
 
             kaftor(text='צור קשר',command=infoo,bgcolor=info,master=bottonFrame)
 
-            kaftor(text='נקה שדות כלט',command=Clear_function,bgcolor=warning,master=bottonFrame)
+            kaftor(text='נקה שדות כלט',command=Clear_function,bgcolor=Button_Color,master=bottonFrame)
 
             kaftor(text='סגור תוכנה',command=des,bgcolor=danger,master=bottonFrame)
 #======================================================================================

@@ -30,7 +30,8 @@ def get_api():
         # Query all records from Workers table and order by workername
         workers_list = Workers.query.order_by(Workers.workername).all()
 
-        # Serialize queried data into JSON format
+
+
         data = [{
             'Rowid': worker.Rowid,
             'hours': worker.hours,
@@ -48,12 +49,11 @@ def get_api():
         return jsonify(data)
 
     except SQLAlchemyError as e:
-        # Handle SQLAlchemy errors
         db.session.rollback()
         return jsonify({'error': f'SQLAlchemy error: {str(e)}'}), 500
 
     except Exception as e:
-        # Handle other unexpected errors
+
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 @app.route('/post', methods=['POST'])
