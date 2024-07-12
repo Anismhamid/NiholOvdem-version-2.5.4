@@ -145,7 +145,7 @@ class MainScreen:
                     tuggle_menu_frame.update()
                     tuggle_menu_frame.after(int(point))
 
-            tuggle_menu_frame = Frame(master=self.new_root, bg=primary)
+            tuggle_menu_frame = Frame(master=self.new_root, bg=primary,borderwidth=1)
             tuggle_menu_frame.place(x=0, y=90, height=window_height, width=200)
 
             # Toggle menu display logic
@@ -153,21 +153,20 @@ class MainScreen:
                 toggle_menu_dis()
             else:
                 toggle_menu_dis()
+            laBel(tuggle_menu_frame, 'שקיפות', light,primary )
 
-            laBel(tuggle_menu_frame, 'תפריט', primary, light)
 
             tuggle_btn.configure(fg_color=primary, command=toggle_menu_dis, text='סגור')
 
             # Transparency Slider
             cale_tk = ctk.CTkSlider(tuggle_menu_frame, command=allpha, from_=0, to=1, fg_color=light, bg_color=primary)
-            laBel(tuggle_menu_frame, 'שקיפות', primary, dark)
+
 
             for i in range(200):
                 tuggle_menu_frame.place(x=i - 200, y=80, height=window_height, width=200)
                 tuggle_menu_frame.update()
                 tuggle_menu_frame.after(int(point))
-
-            cale_tk.pack(ipadx=10,pady=50)
+            cale_tk.pack(ipadx=10,pady=200)
 
         # Menu Button
         tuggle_btn = ctk.CTkButton(
@@ -195,7 +194,7 @@ class MainScreen:
 
 # | פונקצית ייצור צץ להצגת הנתונים |
         def create_treeview(parent_frame):
-            treeview_frame = ttk.Frame(parent_frame)
+            treeview_frame = ttk.Frame(parent_frame ,style='dark')
             treeview_frame.pack(padx=0, pady=0, fill=BOTH, expand=True)
 
             vertical_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='danger', orient="vertical")
@@ -304,7 +303,7 @@ class MainScreen:
 
 # | פונקצית שליחת הנתונים | 
         def post_api():
-            # Assuming  necessary data stored in variables
+
             data = {
                 'WORKERS_NAME_var': WORKERS_NAME_var.get(),
                 'WORKERS_PHONE_var': WORKERS_PHONE_var.get(),
@@ -318,10 +317,8 @@ class MainScreen:
                 'WORKERS_Hours_Var': WORKERS_Hours_Var.get(),
             }
 
-            # Set mainContent-Type header to application/json
             headers = {'mainContent-Type': 'application/json'}
 
-            # تحديد عنوان URL للطلب
             url = 'http://127.0.0.1:5000/post'
 
             try:
@@ -330,7 +327,7 @@ class MainScreen:
                 if response.status_code == 201:
                     toastErrorCacher('הכנסת עובד','העובד הוקלט בהצלחה')
                 else:
-                    # التعامل مع أخطاء محددة إذا فشلت عملية الإضافة
+
                     if response.status_code == 400:
                         toastErrorCacher('שגיאה', 'בקשה גרועה אנא בדוק את הנתונים שלך')
                     elif response.status_code == 500:
@@ -744,18 +741,18 @@ class MainScreen:
 #=======| |  Calclate   | |=========
 
 #                         | פרים חישוב | חיצוני  |
-        fram_heshov = cttk.Frame(self.new_root,relief='sunken',width=100)
+        fram_heshov = Frame(self.new_root)
         fram_heshov.pack(anchor='w',fill='x',pady=0,ipady=0)
 #----------------------------------------------------
 
 #                         | פרים חישוב פנימי  |
-        fram_heshov2 = Frame(fram_heshov,bg='black',relief='sunken',bd=0)
-        fram_heshov2.pack(anchor='s',fill='x',ipadx=0)
+        fram_heshov2 = Frame(fram_heshov)
+        fram_heshov2.pack(anchor='s',fill='x',pady=(0,0))
 #----------------------------------------------------
 
 #                        | בחירת שם לחישוב |
         search2 = ttk.Combobox(fram_heshov2, state='readonly',width=15, font=( mainFont,12 ), justify='center')
-        search2.pack(side='left',padx=(0,0),pady=0)
+        search2.pack(side='left',padx=(0,0),pady=(0,10))
 #----------------------------------------------------
 
 #                 | פונקצית ייבואי שימות מדאטאביס 2 |
@@ -787,11 +784,11 @@ class MainScreen:
 
 #==========================================================| |  Search  | |===========================================
 
-        refreshFrame = Frame(master=fram_heshov2 ,bg=light,relief="solid",border=0)
-        refreshFrame.pack(side='left',padx=(10,0),ipady=0)
+        refreshFrame = Frame(master=fram_heshov2 ,bg=danger,relief="solid",border=0)
+        refreshFrame.pack(side='left',padx=10,ipady=0)
 
         # | כפתור הצג הכל| 
-        kaftor(text='רענן טבלה',master=refreshFrame,command=get_api,bgcolor=primary)
+        kaftor(text='רענן טבלה',master=refreshFrame,command=get_api,bgcolor=Button_Color)
 
 
 
@@ -800,7 +797,8 @@ class MainScreen:
         laBel(fram_heshov2,'חיפוש',light,dark)
 
         search = cttk.Combobox(fram_heshov2,style="Custom.TCombobox", state='readonly',width=15, justify='center')
-        search.pack(side='right', padx=(10,10))
+        search.pack(side='right', pady=0)
+        search.configure(bootstyle='primary')
         search.bind("<<ComboboxSelected>>", Search_function)
 
 
@@ -826,7 +824,7 @@ class MainScreen:
 
 
 
-        f7 = Canvas(self.new_root, bg='gray', bd=0, highlightthickness=0)
+        f7 = Frame(self.new_root, bd=0)
         f7.pack(pady=2, fill='both', expand=True)
 
 
@@ -835,22 +833,22 @@ class MainScreen:
         #------------------- |  מחיקה | ---------
 
         def mainContent():
-            deleteframe = Frame(f7,bg=danger,relief='sunken',bd=5,)
+            deleteframe = cttk.Frame(f7,bootstyle='dark')
             deleteframe.pack(side=LEFT,fill='y')
 
-            laBel(deleteframe,"מחק לפי מ'ס שורה",light,dark)
+            laBel(deleteframe,"מחק לפי מ'ס שורה",dark,light)
 
             En_Delete = cttk.Entry(deleteframe,
                                     textvariable=delete_var,
                                     justify='center',
-                                    font=(mainFont ,15),
+                                    font=(mainFont ,10),
                                     bootstyle='danger')
             En_Delete.pack(pady=0)
 
 
             #==  כפתור מחיקה |=
 
-            kaftor('מחיקה',DeleteAndClear_function,Button_Color,deleteframe,side='bottom')
+            kaftor('מחיקה',DeleteAndClear_function,danger,deleteframe,side='bottom')
     #=====================================================================================================================
 
 
@@ -858,7 +856,7 @@ class MainScreen:
 
 
     #======================== | שדות כלט | =============================
-            f1 = cttk.Frame(f7,bootstyle='primary',relief='sunken',border=5)
+            f1 = cttk.Frame(f7,bootstyle='dark',relief='flat',border=5)
             f1.pack(side='right',fill='y',pady=0)
 
             def en_Title():
