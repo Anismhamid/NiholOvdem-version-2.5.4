@@ -30,8 +30,6 @@ def get_api():
         # Query all records from Workers table and order by workername
         workers_list = Workers.query.order_by(Workers.workername).all()
 
-
-
         data = [{
             'Rowid': worker.Rowid,
             'hours': worker.hours,
@@ -44,8 +42,9 @@ def get_api():
             'worker_id': worker.worker_id,
             'phone': worker.phone,
             'workername': worker.workername,
-        } for worker in workers_list]
-
+        }
+        
+        for worker in workers_list]
         return jsonify(data)
 
     except SQLAlchemyError as e:

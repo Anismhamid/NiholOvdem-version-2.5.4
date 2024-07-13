@@ -1,6 +1,10 @@
+#=======================================| |  ניהול עובדים  | |===========================================
+import xlsxwriter
+from ctypes import alignment
 from tkinter import *
 from tkinter import ttk, StringVar, messagebox
 from tkinter import END
+from tkinter.commondialog import Dialog
 import webbrowser
 import pymysql
 from datetime import datetime
@@ -17,7 +21,9 @@ import ttkbootstrap  as cttk
 from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 from ttkbootstrap.constants import *
-
+import os
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 #-----------------------------------------------
 
 
@@ -42,18 +48,8 @@ light = '#f8f9fa'
 dark = '#343a40'
 Button_Color = '#2F97C1'
 darkBlue ='#0077b6'
-#--------- | translate | --------------
-trns3 = {
-    'שם עובד' : 'workername',
-    'ת.ז' : 'id',
-    'מתאריך' : 'fromdate',
-    'עד תאריך' : 'todate',
-    'תאריך קבלה' : 'takendate',
-}
 
-#-----------------------------------------------
-#
-#================================================================| |  ניהול עובדים  | |========================================================
+
 
 class MainScreen:
     def __init__(self):
@@ -192,28 +188,43 @@ class MainScreen:
 
 #======================= | |  צץ תצוגה   | | =============================
 
+        style = cttk.Style()
+        style.configure("Treeview",
+            background='#FFF',
+            foreground='black',
+            rowheight=22,
+            colwidth=10,
+            fieldbackground=light,
+            font=(mainFont,10,'normal')
+            )
+        style.map('Treeview',
+            background=[('selected',primary)])
+        
 
+        # style.theme_use('default')
 # | פונקצית ייצור צץ להצגת הנתונים |
         def create_treeview(parent_frame):
-            treeview_frame = ttk.Frame(parent_frame ,style='dark')
+            treeview_frame = ttk.Frame(parent_frame )
             treeview_frame.pack(padx=0, pady=0, fill=BOTH, expand=True)
 
-            vertical_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='danger', orient="vertical")
+            vertical_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='warning', orient="vertical")
             vertical_scrollbar.pack(side='right', fill='y')
 
             horizontal_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='danger', orient="horizontal")
             horizontal_scrollbar.pack(side='bottom', fill='x')
+            
 
-
-            workers_treeview = ttk.Treeview(
+            workers_treeview = cttk.Treeview(
                 treeview_frame,
-                padding=(0, 0),
+                bootstyle=DARK,
+                padding=0,
+                style="Treeview",
                 xscrollcommand=horizontal_scrollbar.set,
                 yscrollcommand=vertical_scrollbar.set,
                 columns=('Rowid', "hours", 'taken', "wage", 'address', 'managername', 'compname', 'date', 'worker_id', 'phone', 'workername')
             )
             workers_treeview.pack(fill='both', expand=True)
-            workers_treeview.config(selectmode='extended', height=13)
+            workers_treeview.config(selectmode='extended', height=9)
 
             horizontal_scrollbar.configure(command=workers_treeview.xview)
             vertical_scrollbar.configure(command=workers_treeview.yview)
@@ -239,7 +250,7 @@ class MainScreen:
             workers_treeview.column('address', width=60)
             workers_treeview.column('managername', width=80)
             workers_treeview.column('compname', width=70)
-            workers_treeview.column('date', width=70)
+            workers_treeview.column('date', width=200)
             workers_treeview.column('worker_id', width=80)
             workers_treeview.column('phone', width=80)
             workers_treeview.column('workername', width=70)
@@ -250,8 +261,8 @@ class MainScreen:
 #================ | |  Functions   | | ================================
         
 # | פונקצית תוסט להוצאת תוצאות למשתמש 
-        def toastErrorCacher(title,message):
-            toast = ToastNotification(title=title,message=message,bootstyle='dander',position=(50,50,'ns'),duration=10000,alert=True)
+        def toastErrorCacher(title,message,bg='light',position=(800,0,'ew')):
+            toast = ToastNotification(title=title,bootstyle=bg,message=message,position=position,duration=10000,alert=True)
             toast.show_toast()
 
 # | פונקצית הסתרת צץ הנתונים |
@@ -390,21 +401,19 @@ class MainScreen:
 # | פונקצית מחיקת נתונים |==
         def delete_worker():
             try:
-                # استدعاء الدالة delete_api مع رقم السجل المراد حذفه في عنوان URL
                 worker_id = delete_var.get()
                 response = requests.delete(f'http://127.0.0.1:5000/delete/{worker_id}')
                 if response.status_code == 200:
-                    toastErrorCacher('מחיקת עובד', 'הנתונים נמחקו בהצלחה')
+                    toastErrorCacher('מחיקת עובד', 'הנתונים נמחקו בהצלחה','info')
                 elif response.status_code == 404:
-                    toastErrorCacher('שגיאה', 'העובד לא נמצא')
+                    toastErrorCacher('שגיאה', 'העובד לא נמצא','danger')
                 else:
                     toastErrorCacher('שגיאה', 'מחיקת הנתונים נכשלה. קוד סטטוס: {response.status_code}')
             except requests.exceptions.RequestException as e:
-                # Handle general request exceptions (e.g., network issues)
-                toastErrorCacher('שגיאה', 'אירעה שגיאה: {e}')
+                toastErrorCacher('שגיאה', 'אירעה שגיאה: {e}','danger')
             except Exception as e:
                 # Handle any other unexpected exceptions
-                toastErrorCacher('שגיאה', f'אירעה שגיאה בלתי צפויה: {e}')
+                toastErrorCacher('שגיאה', f'אירעה שגיאה בלתי צפויה: {e}','danger')
 
 
 # | פונקצית ניכוי כל שדות כל  |==
@@ -474,7 +483,7 @@ class MainScreen:
                         WORKERS_PHONE_var.set(row[9])
                         WORKERS_NAME_var.set(row[10])
             except pymysql.err.IntegrityError as e:
-                toastErrorCacher('err', e)
+                toastErrorCacher('err', e,'danger')
             finally:
                 pass
         workers_tuple.bind("<ButtonRelease-1>", get_cursor_function)
@@ -494,14 +503,12 @@ class MainScreen:
                                 delete_query = "DELETE FROM workers WHERE `Rowid` = %s"
                                 cor.execute(delete_query, (row_id,))
                                 workers_tuple.delete(selected_item)
-                            else:
-                                pass
                         con.commit()
                         get_workers_names()
                         get_workers_names2(search2=search2)
                         dataAnalysis_func()
                     else:
-                        toastErrorCacher("שגיאה", "לא נמחק")
+                        toastErrorCacher("שגיאה", "לא נמחק",'danger')
             finally:
                 pass
         workers_tuple.bind('<Delete>', delete_row_function)
@@ -582,7 +589,7 @@ class MainScreen:
                         for row in res:
                             workername, total_wage, total_taken = row
                             Min = total_wage - total_taken
-                            result = messagebox.showinfo('חישוב סך הכל', f'פרוטו עבור {workername} : {total_wage} \n\nקיבל :{total_taken} \n\n נטו : {Min}')
+                            result = messagebox.showinfo('חישוב סך הכל', f'חשבון סופי עובד : {workername} \n\n\n: {total_wage} \n\n\nקיבל :{total_taken} \n\n\n נטו : {Min}')
                             result
                             return total_wage, total_taken, Min
                     else:
@@ -616,11 +623,12 @@ class MainScreen:
             date_entry2.delete(0, END)
             date_entry2.insert(0, formatted_time)
             Header3.after(1000, update_time) # |שדה שעון |
-        date_entry2 = cttk.Entry(Header3,
+        date_entry2 = Entry(Header3,
                                 justify=CENTER,
                                 font=(mainFont, 15, 'bold'),
                                 state='normal')
-        date_entry2.configure(foreground=danger)
+        date_entry2.configure(foreground=light)
+        date_entry2.configure(background=primary)
         
         date_entry2.pack(side='right')
         update_time()
@@ -699,6 +707,7 @@ class MainScreen:
                     column_headers = [workers_tuple.heading(column)["text"] for column in columns]
                     column_headers.reverse()
                     sheet.append(column_headers)
+                    messageFormCompany
                     items = workers_tuple.get_children()
                     for row_idx, item in enumerate(items, start=2):
                         values = [workers_tuple.item(item, "values")[columns.index(column)] for column in columns]
@@ -791,8 +800,9 @@ class MainScreen:
 
 #==========================================================| |  Search  | |===========================================
 
-        refreshFrame = Frame(master=fram_heshov2 ,bg=danger,relief="solid",border=0)
-        refreshFrame.pack(side='left',padx=10,ipady=0)
+        refreshFrame = Frame(master=fram_heshov2 ,relief="solid",border=0)
+        refreshFrame.config(bg=primary)
+        refreshFrame.pack(side='left',padx=0,ipady=0)
 
         # | כפתור הצג הכל| 
         kaftor(text='הצג הכל',master=refreshFrame,command=get_api,bgcolor=light)
@@ -844,7 +854,7 @@ class MainScreen:
             deleteframe.config(bg=primary)
             deleteframe.pack(side=LEFT,fill='y')
 
-            laBel(deleteframe,"מחק לפי מ'ס שורה",dark,light)
+            laBel(deleteframe,"מחק לפי מ'ס שורה",primary,light)
 
             En_Delete = cttk.Entry(deleteframe,
                                     textvariable=delete_var,
@@ -943,19 +953,21 @@ class MainScreen:
             # ====================== | ניתוח נתונים |
             
             # | פרים ניתוח נתונים | -----------------------------
-            underprintFrame = Frame(f7,bg=primary,relief='sunken',bd=1)
+            underprintFrame = ctk.CTkFrame (f7)
+            underprintFrame.configure(fg_color=dark)
             underprintFrame.pack(pady=0,fill='both',ipady=300)
             
 
             global dataAnalysis_func
             def dataAnalysis_func():
                 global get_workers_names2
-                calc_Days_Frame = cttk.Frame(underprintFrame,bootstyle="primary")
+                calc_Days_Frame = ctk.CTkFrame(underprintFrame)
+                calc_Days_Frame.configure(fg_color="#32373B")
                 calc_Days_Frame.pack(fill='both',ipady=300)
 
                 # =========== | לאביל ניתוח נתונים | =============
                 laBel(calc_Days_Frame,'ניתוח נתונים',primary,light)
-
+                global search_ttk
                 search_ttk = cttk.Combobox(master=calc_Days_Frame,
                                         style="Custom.TCombobox",
                                         validate='all',
@@ -1048,6 +1060,21 @@ class MainScreen:
                         toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                         pass
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 def Company():
                     try:
                         connection = pymysql.connect(host=hostname1, user=username1, passwd=passwd1, port=porta,  database=database1)
@@ -1059,26 +1086,24 @@ class MainScreen:
                                 SELECT compname, workername, COUNT(*) AS total_days_worked 
                                 FROM workers 
                                 WHERE workername = '{selected_value}' 
-                                GROUP BY compname, workername
+                                GROUP BY compname, workername,hours
                             """
-
-
-
 
                         cursor.execute(query)
                         results = cursor.fetchall()
                         
                         if results:
-                            message = "פרטי החברות, מזהה העובד, ומספר הימים שעבד בכל חברה:\n"
+                            global messageFormCompany
+                            messageFormCompany = "פרטי החברות\n\n \n\nמספר ימי עבודה בכל חברה\n\n"
                             for result in results:
                                 company_name = result[0]
                                 workername = result[1]
                                 days_worked = result[2]
-                                message += f"חברה: {company_name}, מזהה עובד: {workername}, ימים שעבד: {days_worked}\n"
-                            messagebox.showinfo("פרטי העבודה בחברות", message)
+                                messageFormCompany += f"_______________________________________________\n\nשם חברה: {company_name}\n\n מזהה עובד: {workername}\n\nימים שעבד: {days_worked}\n\n"
+                            cttk.dialogs.dialogs.Messagebox.ok(messageFormCompany, title=' ', alert=False, parent=None)
+                            # messagebox.showinfo("פרטי העבודה בחברות", message)
                         else:
                             messagebox.showinfo("ERROR", "אין נתונים להצגה")
-                                        
                     except pymysql.err.DatabaseError as e:
                         toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                         return None
@@ -1088,7 +1113,7 @@ class MainScreen:
                         conn = pymysql.connect(host=hostname1, port=porta, user=username1, passwd=passwd1, database=database1)
                         cursor = conn.cursor()
                         worker_name = search_ttk.get()
-                        query = f"SELECT workername, SUM(`hrs`) AS total_wage FROM workers WHERE workername = '{worker_name}' GROUP BY workername"
+                        query = f"SELECT workername, SUM(`hours`) AS total_wage FROM workers WHERE workername = '{worker_name}' GROUP BY workername"
                         cursor.execute(query)
                         res = cursor.fetchall()
                         total_wage = res[0]
@@ -1097,12 +1122,90 @@ class MainScreen:
                         else:
                             messagebox.showinfo('אין תוצאות', 'לא נמצאו נתונים עבור העובד המבוקש')
                     except Exception as e:
-                        toastErrorCacher('לא ניתן להתחבר לשרת MySQL', f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}")
+                        toastErrorCacher('לא ניתן להתחבר לשרת MySQL',
+                                        f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}", 'danger')
                     finally:
                         pass
 
-                buttonsframe = cttk.Frame(master=calc_Days_Frame,bootstyle="primary")
-                buttonsframe.pack(side=RIGHT,fill='y')
+                buttonsframe = Frame(master=calc_Days_Frame,relief='groove')
+                buttonsframe.config(bg=dark)
+                buttonsframe.pack(side=RIGHT,fill='x')
+
+
+                def generate_excel():
+                    search_value = search_ttk.get()
+                    try:
+                        # Connect to MySQL database
+                        connection = pymysql.connect(host=hostname1, user=username1, passwd=passwd1, port=porta, database=database1)
+                        cursor = connection.cursor()
+
+                        # Define the SQL query with parameter placeholder %s
+                        query = """
+                            SELECT compname, workername, COUNT(*) AS total_days_worked 
+                            FROM workers 
+                            WHERE workername = %s
+                            GROUP BY compname, workername
+                        """
+
+                        cursor.execute(query, (search_value,))
+                        results = cursor.fetchall()
+
+                        # If there are results, create Excel file
+                        if results:
+                            # Create a new Excel workbook
+                            excel_filename = f"{search_value}.xlsx"
+                            excel_path = os.path.join(os.getcwd(), excel_filename)
+                            workbook = xlsxwriter.Workbook(excel_path)
+                            worksheet = workbook.add_worksheet("דוח חברה")
+
+                            # Define formats for header and data
+                            header_format = workbook.add_format({'bold': True, 'align': 'right', 'text_wrap': True})
+                            data_format = workbook.add_format({'align': 'right', 'text_wrap': True})
+
+                            # Write headers
+                            headers = ["שם חברה", "מזהה עובד", "ימים שעבד"]
+                            for col, header in enumerate(headers):
+                                worksheet.write(0, col, header, header_format)
+
+                            # Write data rows
+                            for row_idx, result in enumerate(results, start=1):
+                                company_name = result[0]
+                                worker_name = result[1]
+                                days_worked = result[2]
+                                worksheet.write(row_idx, 0, company_name, data_format)
+                                worksheet.write(row_idx, 1, worker_name, data_format)
+                                worksheet.write(row_idx, 2, days_worked, data_format)
+
+                            # Adjust column widths based on content length
+                            for col_idx, header in enumerate(headers):
+                                max_length = max(len(str(header)), max(len(str(result[col_idx])) for result in results))
+                                worksheet.set_column(col_idx, col_idx, max_length + 4)
+
+                            # Close the workbook
+                            workbook.close()
+
+                            # Show success message
+                            messagebox.showinfo("נוצר קובץ Excel", f"נוצר קובץ Excel בשם: {excel_filename} בתיקייה: {excel_path}")
+
+                        else:
+                            # Show message if no results found
+                            messagebox.showinfo("אין נתונים", "לא נמצאו נתונים עבור העובד המבוקש")
+
+                    except pymysql.err.DatabaseError as e:
+                        # Handle database errors
+                        print(e)
+                        messagebox.showerror("שגיאה בגישה למסד הנתונים", f"אירעה שגיאה בגישה למסד הנתונים: {str(e)}")
+
+                    except Exception as e:
+                        # Handle other errors
+                        print(e)
+                        messagebox.showerror("שגיאה ביצירת קובץ Excel", f"אירעה שגיאה ביצירת קובץ Excel: {str(e)}")
+
+                    finally:
+                        # Close database connection
+                        if connection:
+                            connection.close()
+
 
 
 
@@ -1113,21 +1216,31 @@ class MainScreen:
                                         command=command,
                                         corner_radius=0,
                                         border_width=0,
+                                        border_color='#fff',
                                         text_color=light,
-                                        fg_color=dark,
-                                        font=(mainFont,17,'bold'
-                                        ))
-                    btn2.pack(pady=(0,2))
+                                        fg_color=primary,
+                                        font=(mainFont,18,'bold'
+                                        ));
+                    btn2.pack(pady=2)
+                    def on_enter(event):
+                        btn2.configure(border_width=1)
+                    def on_leave(event):
+                        btn2.configure(border_width=0)
 
+                    btn2.bind('<Enter>', on_enter)
+                    btn2.bind('<Leave>', on_leave)
+                
                 dataAnalysis(text='ימי עבודה ',command=howMutchDays)
                 dataAnalysis(text='קיבל מפריעה',command=takenMoney)
                 dataAnalysis(text='כמה עובדים יש',command=howMutchDaysAll)
                 dataAnalysis(text='חברה',command=Company)
                 dataAnalysis(text='שעות עבודה',command=hours)
+                dataAnalysis(text='הדפסה',command=generate_excel)
+                # dataAnalysis(text='שעות עבודה',command=generate_pdf(results))
             dataAnalysis_func()
     #----------------------------------------------------------
 
-
+            
 
             # | מס שורה |
             laBel(rowIdFrame,'שורה',light,dark)
