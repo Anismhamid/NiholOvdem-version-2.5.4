@@ -694,11 +694,12 @@ class MainScreen:
         # Print to Excel
         def print_to_excel():
             selected_value = search.get()
-            default_file_name2 = f'{selected_value}'
+            
             try:
                 file_path = filedialog.asksaveasfilename(defaultextension=".xlsx",
-                                                        initialfile=default_file_name2,
+                                                        initialfile=selected_value,
                                                         filetypes=[("Excel Files", "*.xlsx")])
+                
                 if file_path:
                     workbook = openpyxl.Workbook()
                     sheet = workbook.active
@@ -707,17 +708,32 @@ class MainScreen:
                     column_headers = [workers_tuple.heading(column)["text"] for column in columns]
                     column_headers.reverse()
                     sheet.append(column_headers)
-                    messageFormCompany
                     items = workers_tuple.get_children()
+
                     for row_idx, item in enumerate(items, start=2):
                         values = [workers_tuple.item(item, "values")[columns.index(column)] for column in columns]
                         values.reverse()
+
                         for col_idx, value in enumerate(values, start=1):
                             sheet.cell(row=row_idx, column=col_idx, value=value)
+
+                    for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row):
+                        for cell in row:
+                            cell.alignment = openpyxl.styles.Alignment(wrap_text=True)
+                            cell.font = openpyxl.styles.Font(size=14)  # Font size can be adjusted
+                            cell.alignment = openpyxl.styles.Alignment(vertical='center')  # Vertical alignment can be adjusted
+                            sheet.row_dimensions[cell.row].height = 30
+
+                    for col_idx, column_header in enumerate(column_headers, start=1):
+                        col_letter = openpyxl.utils.get_column_letter(col_idx)
+                        sheet.column_dimensions[col_letter].width = 20
+
+
                     for col_idx, column_header in enumerate(column_headers, start=1):
                         sheet.cell(row=1, column=col_idx, value=column_header)
-                        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = len(column_header) + 2
+                        sheet.column_dimensions[openpyxl.utils.get_column_letter(col_idx)].width = len(column_header) +8
                     workbook.save(file_path)
+
                     if workbook:
                         messagebox.showinfo('הצלחה', f"הקובץ נשמר ב: {file_path}")
             except FileNotFoundError:
@@ -725,6 +741,7 @@ class MainScreen:
             except PermissionError:
                 toastErrorCacher('שגיאה', 'הקובץ לא ניתן לכתיבה. נא לסגור אותו ולנסות שוב.')
             except Exception as e:
+                print(e)
                 toastErrorCacher('שגיאה', f'אירעה שגיאה: {str(e)}')
 
 

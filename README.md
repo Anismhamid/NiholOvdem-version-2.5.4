@@ -1,5 +1,5 @@
 # application image
-
+![WM application image](WM.png)
 
 # Description
 
