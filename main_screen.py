@@ -36,7 +36,9 @@ username1 ='root'
 passwd1 = 'root'
 database1='local'
 
-
+themes = ['flatly', 'cyborg', 'litera', 'minty', 'lumen', 'sandstone', 
+'yeti', 'pulse', 'united', 'morph', 'journal', 'darkly', 
+'superhero', 'solar', 'cosmo', 'vapor', 'simplex', 'cerculean']
 #--------- | colors | --------------
 primary = '#2E4057'
 secondary = '#adb5bd'
@@ -46,7 +48,6 @@ warning = '#F1D302'
 danger = '#C1292E'
 light = '#f8f9fa'
 dark = '#343a40'
-Button_Color = '#2F97C1'
 darkBlue ='#0077b6'
 
 
@@ -59,7 +60,7 @@ class MainScreen:
         self.new_root.title('ניהול עוהדים, Develobed by °Anis Zkaria Mhamid°')
         self.new_root.config(bd=0)
         self.new_root.minsize(True,True)
-        self.new_root.configure(fg_color=primary)
+        # self.new_root.configure(fg_color=primary)
 
 
 
@@ -104,23 +105,23 @@ class MainScreen:
 
 # ============= | |  Header   | | ===================================
 
-        Header = ctk.CTkFrame(self.new_root,height=29,fg_color=primary)
+        Header = cttk.Frame(self.new_root,height=29)
         Header.pack(fill='x',pady=4)
         Header.pack_propagate(False)
 
-        Header3 = ctk.CTkFrame(self.new_root,fg_color=primary)
+        Header3 = cttk.Frame(self.new_root)
         Header3.pack(fill='both')
 
         # main label | ======
-        def laBel(master,text,background,foreground,side='top'):
-            welcome_to_my_app =cttk.Label(master=master,text=text,background=background, foreground=foreground,font=(mainFont,16,'bold'))
+        def laBel(master,text,side='top'):
+            welcome_to_my_app =cttk.Label(master=master,text=text,font=(mainFont,16,'bold'))
             welcome_to_my_app.pack(side=side)
-        laBel(Header,'ניהול עובדים' ,primary,success)
+        laBel(Header,'ניהול עובדים')
 
         # main Button  | | ==========
-        def kaftor(text,command,bgcolor,master,side='top'):
-            buttons = ctk.CTkButton(master=master,border_color=dark,text_color=dark,font=(mainFont,17,'bold'),hover_color=success,corner_radius=0,fg_color=bgcolor,text=text,command=command,cursor='hand2')
-            buttons.pack(side=side,pady=5,ipady=8,ipadx=20)
+        def kaftor(text,command,master,side='top'):
+            buttons = cttk.Button(master=master,default='active',text=text,command=command,cursor='hand2')
+            buttons.pack(side=side,pady=5,ipady=8,fill=X)
 #=====================================================================================================================
 
 
@@ -135,14 +136,14 @@ class MainScreen:
             window_height = self.new_root.winfo_height() - 200
 
             def toggle_menu_dis():
-                tuggle_btn.configure(fg_color=primary, command=toggle_menu, text='תפריט')
+                tuggle_btn.configure( command=toggle_menu, text='תפריט')
 
                 for i in range(200):
                     tuggle_menu_frame.place(x=-i - 120, y=90, height=window_height, width=20)
                     tuggle_menu_frame.update()
                     tuggle_menu_frame.after(int(point))
 
-            tuggle_menu_frame = Frame(master=self.new_root, bg=primary,borderwidth=1)
+            tuggle_menu_frame = Frame(master=self.new_root,borderwidth=1)
             tuggle_menu_frame.place(x=0, y=90, height=window_height, width=200)
 
             # Toggle menu display logic
@@ -150,14 +151,13 @@ class MainScreen:
                 toggle_menu_dis()
             else:
                 toggle_menu_dis()
-            laBel(tuggle_menu_frame, 'שקיפות', light,primary )
+            laBel(tuggle_menu_frame, 'שקיפות' )
 
 
-            tuggle_btn.configure(fg_color=primary, command=toggle_menu_dis, text='סגור')
+            tuggle_btn.configure( command=toggle_menu_dis, text='סגור')
 
             # Transparency Slider
-            cale_tk = ctk.CTkSlider(tuggle_menu_frame, command=allpha, from_=0, to=1, fg_color=light, bg_color=primary)
-
+            cale_tk = ctk.CTkSlider(tuggle_menu_frame, command=allpha, from_=0, to=1)
 
             for i in range(200):
                 tuggle_menu_frame.place(x=i - 200, y=80, height=window_height, width=200)
@@ -166,14 +166,10 @@ class MainScreen:
             cale_tk.pack(ipadx=10,pady=200)
 
         # Menu Button
-        tuggle_btn = ctk.CTkButton(
+        tuggle_btn = cttk.Button(
             Header,
-            width=5,
+            width=10,
             text='תפריט',
-            border_width=1,
-            border_color=danger,
-            font=(mainFont, 20, 'bold'),
-            fg_color=primary,
             compound='left',
             command=toggle_menu
         )
@@ -181,54 +177,72 @@ class MainScreen:
 
 
 
-#========================================================================================
 
+#========================================================================================
 
 
 
 #======================= | |  צץ תצוגה   | | =============================
 
-        style = cttk.Style()
+        style =cttk.Style()
+        style.theme_use(themes[0])
+        def change_theme(event):
+            selected_theme = combobox.get()
+            style.theme_use(selected_theme)
+            style.configure("Treeview",
+
+                font=(mainFont, 10, 'normal'),
+                rowheight=22)
+
+        combobox = cttk.Combobox(Header, values=themes,width=10,
+                        style="Custom.TCombobox",
+                                        validate='all',
+                                        state='readonly',
+                                        font=(mainFont,10),
+                                        justify='center')
+        combobox.place(x=200)
+        combobox.set(themes[0]) 
+
+        # Bind combobox selection to theme change function
+        combobox.bind('<<ComboboxSelected>>', change_theme)
+
+        # Set initial theme
+        style.theme_use(themes[6])
+
+
         style.configure("Treeview",
-            background='#FFF',
-            foreground='black',
-            rowheight=22,
-            colwidth=10,
-            fieldbackground=light,
-            font=(mainFont,10,'normal')
-            )
+                        background='#D3D3D3',
+                        foreground=dark,
+                        fieldbackground='#D3D3D3',
+                        font=(mainFont, 10, 'normal'),
+                        rowheight=22)
+
         style.map('Treeview',
-            background=[('selected',primary)])
-        
+                background=[('selected', '#0078D7')])
 
-        # style.theme_use('default')
-# | פונקצית ייצור צץ להצגת הנתונים |
+        style.configure("Treeview.Heading",
+                        font=('Arial', 9, 'bold'))
+
+
+        # | פונקצית ייצור צץ להצגת הנתונים |
         def create_treeview(parent_frame):
-            treeview_frame = ttk.Frame(parent_frame )
-            treeview_frame.pack(padx=0, pady=0, fill=BOTH, expand=True)
+            treeview_frame = ttk.Frame(parent_frame)
+            treeview_frame.pack(padx=0, pady=0, fill=cttk.BOTH, expand=True)
 
-            vertical_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='warning', orient="vertical")
+            vertical_scrollbar = ttk.Scrollbar(treeview_frame, orient="vertical")
             vertical_scrollbar.pack(side='right', fill='y')
 
-            horizontal_scrollbar = ttk.Scrollbar(treeview_frame,bootstyle='danger', orient="horizontal")
-            horizontal_scrollbar.pack(side='bottom', fill='x')
-            
 
             workers_treeview = cttk.Treeview(
                 treeview_frame,
-                bootstyle=DARK,
-                padding=0,
-                style="Treeview",
-                xscrollcommand=horizontal_scrollbar.set,
+                columns=('Rowid', "hours", 'taken', "wage", 'address', 'managername', 'compname', 'date', 'worker_id', 'phone', 'workername'),
                 yscrollcommand=vertical_scrollbar.set,
-                columns=('Rowid', "hours", 'taken', "wage", 'address', 'managername', 'compname', 'date', 'worker_id', 'phone', 'workername')
+                selectmode='extended', 
+                height=9
             )
-            workers_treeview.pack(fill='both', expand=True)
-            workers_treeview.config(selectmode='extended', height=9)
+            workers_treeview.pack(fill=cttk.BOTH, expand=True)
 
-            horizontal_scrollbar.configure(command=workers_treeview.xview)
             vertical_scrollbar.configure(command=workers_treeview.yview)
-            workers_treeview.xview_moveto(1)
 
             workers_treeview.heading('Rowid', text="מ'ס שורה")
             workers_treeview.heading('hours', text="מ'ס שעות")
@@ -242,18 +256,21 @@ class MainScreen:
             workers_treeview.heading('phone', text='טלפון')
             workers_treeview.heading('workername', text='שם')
 
-            workers_treeview.column('#0', width=0, stretch=NO)
-            workers_treeview.column('Rowid', width=40)
-            workers_treeview.column('hours', width=40)
-            workers_treeview.column('taken', width=50)
-            workers_treeview.column('wage', width=50)
-            workers_treeview.column('address', width=60)
-            workers_treeview.column('managername', width=80)
-            workers_treeview.column('compname', width=70)
-            workers_treeview.column('date', width=200)
-            workers_treeview.column('worker_id', width=80)
-            workers_treeview.column('phone', width=80)
-            workers_treeview.column('workername', width=70)
+            workers_treeview.column('#0', width=0, stretch=cttk.NO, anchor=cttk.CENTER)
+            workers_treeview.column('Rowid', width=40, anchor=cttk.CENTER)
+            workers_treeview.column('hours', width=40, anchor=cttk.CENTER)
+            workers_treeview.column('taken', width=50, anchor=cttk.CENTER)
+            workers_treeview.column('wage', width=50, anchor=cttk.CENTER)
+            workers_treeview.column('address', width=60, anchor=cttk.CENTER)
+            workers_treeview.column('managername', width=80, anchor=cttk.CENTER)
+            workers_treeview.column('compname', width=70, anchor=cttk.CENTER)
+            workers_treeview.column('date', width=200, anchor=cttk.CENTER)
+            workers_treeview.column('worker_id', width=80, anchor=cttk.CENTER)
+            workers_treeview.column('phone', width=80, anchor=cttk.CENTER)
+            workers_treeview.column('workername', width=70, anchor=cttk.CENTER)
+
+
+
 
             return workers_treeview
         workers_tuple = create_treeview(self.new_root)
@@ -286,31 +303,32 @@ class MainScreen:
                     
                     # Clear existing treeview data
                     workers_tuple.delete(*workers_tuple.get_children())
-                    
+                    count=0
                     # Inserting new data from the API into the Treeview
                     for row in data:
-                        workers_tuple.insert('', END, values=(
-                            row['Rowid'],
-                            row['hours'],
-                            row['taken'],
-                            row['wage'],
-                            row['address'],
-                            row['managername'],
-                            row['compname'],
-                            row['date'],
-                            row['worker_id'],
-                            row['phone'],
-                            row['workername']
-                        ))
+                        if count % 2==0:
+                            workers_tuple.insert('', END, values=(
+                                row['Rowid'],
+                                row['hours'],
+                                row['taken'],
+                                row['wage'],
+                                row['address'],
+                                row['managername'],
+                                row['compname'],
+                                row['date'],
+                                row['worker_id'],
+                                row['phone'],
+                                row['workername']
+                            ), tags=('evenrow','odd'))
                 else:
                     # If the request fails
                     toastErrorCacher('Error', f'Failed to fetch data. Status code: {response.status_code}')
                     print(response.status_code)
+            
             except requests.exceptions.RequestException as e:
                 print(e)
                 toastErrorCacher('Error', f'An error occurred: {e}')
         get_api()
-
 
 
 # | פונקצית שליחת הנתונים | 
@@ -323,7 +341,7 @@ class MainScreen:
                 'WORKERS_COMPANY_NAME_var': WORKERS_COMPANY_NAME_var.get(),
                 'WORKERS_COMPANY_MANAGER_NAME_var': WORKERS_COMPANY_MANAGER_NAME_var.get(),
                 'WORKERS_WORK_ADDRESS_var': WORKERS_WORK_ADDRESS_var.get(),
-                # 'WORKERS_DATE_var': WORKERS_DATE_var.get(),
+                'WORKERS_DATE_var': WORKERS_DATE_var.get(),
                 'WORKERS_WAGE_var': WORKERS_WAGE_var.get(),
                 'WORKERS_Taken_var': WORKERS_Taken_var.get(),
                 'WORKERS_Hours_Var': WORKERS_Hours_Var.get(),
@@ -602,14 +620,13 @@ class MainScreen:
 
 #-------------- | תאריך | ------------------ 
         def update_date():
+            
             current_date = datetime.now().date()
-            global date_entry
             date_entry = Entry(Header3, font=(mainFont, 15, 'bold'),justify=CENTER, state='normal')
             date_entry.configure(bg=primary)
             date_entry.configure(fg=light)
             date_entry.insert(0, current_date)
             date_entry.pack(side='left',padx=0)
-            WORKERS_DATE_var.set(current_date)
         update_date()
 
 
@@ -754,10 +771,8 @@ class MainScreen:
 #================== | כפתורים עליונים | =================
 
         def topButtons(text,command,side):
-            _top = ctk.CTkButton(Header3,
-                                corner_radius=0,
+            _top = cttk.Button(Header3,
                                 width=150,
-                                font=(mainFont,15,"bold"),
                                 text=text,
                                 command=command)
             _top.pack(side=side,padx='20')
@@ -807,10 +822,6 @@ class MainScreen:
 #                         | כפתור חישוב |                
         calcbtn = cttk.Button(master = fram_heshov2,
                                 text='חישוב',
-                                
-                                bootstyle='info',
-                                # hover_color=success,
-                                # font=(mainFont ,20,'bold'),
                                 command=calculate_sum_function)
         calcbtn.pack(side=LEFT,padx=(1,50),pady=(0,5),ipady=(5))
 
@@ -822,13 +833,13 @@ class MainScreen:
         refreshFrame.pack(side='left',padx=0,ipady=0)
 
         # | כפתור הצג הכל| 
-        kaftor(text='הצג הכל',master=refreshFrame,command=get_api,bgcolor=light)
+        kaftor(text='הצג הכל',master=refreshFrame,command=get_api)
 
 
 
 
 # ------------------- | בחירת שם חיפוש | -----------------------------------
-        laBel(fram_heshov2,'חיפוש',primary,light,side=RIGHT)
+        laBel(fram_heshov2,'חיפוש',side=RIGHT)
 
         search = cttk.Combobox(fram_heshov2,style="Custom.TCombobox", state='readonly',width=15, justify='center')
         search.pack(side='right', pady=(0,5),padx=(0,30))
@@ -857,11 +868,11 @@ class MainScreen:
 
 
 
-
         f7 = Frame(self.new_root, bd=0)
         f7.pack(pady=2, fill='both', expand=True)
 
 
+        
 #============================= | |  Main Content Area   | | ====================================
 
         #------------------- |  מחיקה | ---------
@@ -871,7 +882,7 @@ class MainScreen:
             deleteframe.config(bg=primary)
             deleteframe.pack(side=LEFT,fill='y')
 
-            laBel(deleteframe,"מחק לפי מ'ס שורה",primary,light)
+            laBel(deleteframe,"מחק לפי מ'ס שורה")
 
             En_Delete = cttk.Entry(deleteframe,
                                     textvariable=delete_var,
@@ -883,7 +894,7 @@ class MainScreen:
 
             #==  כפתור מחיקה |=
 
-            kaftor('מחיקה',DeleteAndClear_function,danger,deleteframe,side='bottom')
+            kaftor('מחיקה',DeleteAndClear_function,deleteframe,side='bottom')
     #=====================================================================================================================
 
 
@@ -920,18 +931,35 @@ class MainScreen:
                 entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_NAME_var ,placehold = 'שם')
                 entry_and_entryTitle(master = f1 , validcommand = (digit_func, '%P'), valid='focus' , textvar = WORKERS_PHONE_var ,placehold = 'טלפון')
                 entry_and_entryTitle(master = f1 , validcommand = (digit_func, '%P'), valid='focus' , textvar = WORKERS_ID_var ,placehold= 'ת.ז')
-                entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_DATE_var ,placehold = '')
+                def get_date_from_entry():
+                    global date_entry
+                    date_entry = cttk.DateEntry(f1, dateformat='%x', firstweekday=1, startdate=None, style='default').pack(pady=(3, 0))
+                def update_date_var():
+                    entered_date = date_entry.get()
+                    WORKERS_DATE_var.set(entered_date)
+                    print(entered_date)
+
+
+                # Create DateEntry widget and bind update function
+                update_date_var = get_date_from_entry()
+
+
+
+
+
+                # entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_DATE_var ,placehold = '')
                 entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_COMPANY_NAME_var ,placehold = 'שם חברה')
                 entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_COMPANY_MANAGER_NAME_var ,placehold = ' מנהל עבודה') 
                 entry_and_entryTitle(master = f1 , validcommand = (alpha_func, '%P'), valid='focus' , textvar = WORKERS_WORK_ADDRESS_var ,placehold = 'כתובת')
                 entry_and_entryTitle(master = f1 , validcommand = (digit_func, '%P'), valid='focus' , textvar = WORKERS_WAGE_var ,placehold = 'שח')
                 entry_and_entryTitle(master = f1 , validcommand = (digit_func, '%P'), valid='focus' , textvar = WORKERS_Taken_var ,placehold = '0')
+                # kaftor('hhh',update_date_var,f1)
 
-
+                
                 #========================= | כפתור הןספה | ======================
-                button1 = ctk.CTkButton(f1,corner_radius=0,hover_color=danger, text='הוספת', fg_color=success, text_color='black', font=(mainFont, 16, 'bold'), command=addandclear_function, cursor='hand2 ')
+                button1 = cttk.Button(f1, text='הוספת', command=addandclear_function, cursor='hand2 ')
                 button1.pack(side=BOTTOM,pady=(0,10))
-                ToolTip(button1,delay=250, text="מלא את שדות הכלט מטה לפני ההוספה", bootstyle=('dark', INVERSE))
+                ToolTip(button1,delay=250, text="מלא את שדות הכלט מעלה לפני ההוספה", bootstyle=('dark', INVERSE))
             en_Title()
 
     #=======================================================================
@@ -947,17 +975,17 @@ class MainScreen:
 
             entry_and_entryTitle(master=bottonFrame,validcommand=(alpha_func, '%P'),valid='focus',textvar=WORKERS_Hours_Var,placehold=str("מ'ס שעות"))
 
-            kaftor(text='תיקון',command=updateandclear,bgcolor=warning,master=bottonFrame)
+            kaftor(text='תיקון',command=updateandclear,master=bottonFrame)
 
-            kaftor(text="Docx הדפסה ל",command=print_to_docx,bgcolor=darkBlue,master=bottonFrame)
+            kaftor(text="Docx הדפסה ל",command=print_to_docx,master=bottonFrame)
 
-            kaftor(text="Exel הדפסה ל",command=print_to_excel,bgcolor=success,master=bottonFrame)
+            kaftor(text="Exel הדפסה ל",command=print_to_excel,master=bottonFrame)
 
-            kaftor(text='צור קשר',command=infoo,bgcolor=info,master=bottonFrame)
+            kaftor(text='צור קשר',command=infoo,master=bottonFrame)
 
-            kaftor(text='נקה שדות כלט',command=Clear_function,bgcolor=Button_Color,master=bottonFrame)
+            kaftor(text='נקה שדות כלט',command=Clear_function,master=bottonFrame)
 
-            kaftor(text='סגור תוכנה',command=des,bgcolor=danger,master=bottonFrame)
+            kaftor(text='סגור תוכנה',command=des,master=bottonFrame)
 #======================================================================================
 
 
@@ -970,20 +998,18 @@ class MainScreen:
             # ====================== | ניתוח נתונים |
             
             # | פרים ניתוח נתונים | -----------------------------
-            underprintFrame = ctk.CTkFrame (f7)
-            underprintFrame.configure(fg_color=dark)
+            underprintFrame = cttk.Frame (f7)
             underprintFrame.pack(pady=0,fill='both',ipady=300)
             
 
             global dataAnalysis_func
             def dataAnalysis_func():
                 global get_workers_names2
-                calc_Days_Frame = ctk.CTkFrame(underprintFrame)
-                calc_Days_Frame.configure(fg_color="#32373B")
+                calc_Days_Frame = cttk.Frame(underprintFrame)
                 calc_Days_Frame.pack(fill='both',ipady=300)
 
                 # =========== | לאביל ניתוח נתונים | =============
-                laBel(calc_Days_Frame,'ניתוח נתונים',primary,light)
+                laBel(calc_Days_Frame,'ניתוח נתונים')
                 global search_ttk
                 search_ttk = cttk.Combobox(master=calc_Days_Frame,
                                         style="Custom.TCombobox",
@@ -1076,20 +1102,6 @@ class MainScreen:
                     except pymysql.err.DatabaseError as e:
                         toastErrorCacher("אירעה שגיאה בעת התחברות למסד הנתונים:", e)
                         pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
                 def Company():
@@ -1224,28 +1236,14 @@ class MainScreen:
                             connection.close()
 
 
-
-
         # ====================== | כפתורי בדיקה |
                 def dataAnalysis(text,command):
-                    btn2 = ctk.CTkButton(master=buttonsframe,
+                    btn2 = cttk.Button(master=buttonsframe,
                                         text=text,
                                         command=command,
-                                        corner_radius=0,
-                                        border_width=0,
-                                        border_color='#fff',
-                                        text_color=light,
-                                        fg_color=primary,
-                                        font=(mainFont,18,'bold'
-                                        ));
-                    btn2.pack(pady=2)
-                    def on_enter(event):
-                        btn2.configure(border_width=1)
-                    def on_leave(event):
-                        btn2.configure(border_width=0)
-
-                    btn2.bind('<Enter>', on_enter)
-                    btn2.bind('<Leave>', on_leave)
+                                        width=30
+                                        );
+                    btn2.pack(pady=2,fill=X)
                 
                 dataAnalysis(text='ימי עבודה ',command=howMutchDays)
                 dataAnalysis(text='קיבל מפריעה',command=takenMoney)
@@ -1260,7 +1258,7 @@ class MainScreen:
             
 
             # | מס שורה |
-            laBel(rowIdFrame,'שורה',light,dark)
+            laBel(rowIdFrame,'שורה')
 
     #--------------------------------------------------
 
@@ -1269,10 +1267,6 @@ class MainScreen:
             iidentry.pack(pady=0,side='bottom')
         mainContent()
 
-
         self.new_root.mainloop()
-
-
-
 if __name__ == '__main__':
     MainScreen()
