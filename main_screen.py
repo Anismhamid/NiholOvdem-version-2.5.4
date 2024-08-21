@@ -1,6 +1,5 @@
 #=======================================| |  ניהול עובדים  | |===========================================
 import xlsxwriter
-from ctypes import alignment
 from tkinter import *
 from tkinter import ttk, StringVar, messagebox
 from tkinter import END
@@ -22,8 +21,6 @@ from ttkbootstrap.toast import ToastNotification
 from ttkbootstrap.tooltip import ToolTip
 from ttkbootstrap.constants import *
 import os
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 #-----------------------------------------------
 
 
@@ -39,6 +36,10 @@ database1='local'
 themes = ['flatly', 'cyborg', 'litera', 'minty', 'lumen', 'sandstone', 
 'yeti', 'pulse', 'united', 'morph', 'journal', 'darkly', 
 'superhero', 'solar', 'cosmo', 'vapor', 'simplex', 'cerculean']
+
+
+
+
 #--------- | colors | --------------
 primary = '#2E4057'
 secondary = '#adb5bd'
@@ -190,8 +191,9 @@ class MainScreen:
             selected_theme = combobox.get()
             style.theme_use(selected_theme)
             style.configure("Treeview",
-
-                font=(mainFont, 10, 'normal'),
+                font=(mainFont, 10,
+                    'normal'
+                    ),
                 rowheight=22)
 
         combobox = cttk.Combobox(Header, values=themes,width=10,
@@ -323,11 +325,9 @@ class MainScreen:
                 else:
                     # If the request fails
                     toastErrorCacher('Error', f'Failed to fetch data. Status code: {response.status_code}')
-                    print(response.status_code)
             
             except requests.exceptions.RequestException as e:
-                print(e)
-                toastErrorCacher('Error', f'An error occurred: {e}')
+                toastErrorCacher('API Field to load', f'An error occurred: {e}')
         get_api()
 
 
@@ -620,7 +620,6 @@ class MainScreen:
 
 #-------------- | תאריך | ------------------ 
         def update_date():
-            
             current_date = datetime.now().date()
             date_entry = Entry(Header3, font=(mainFont, 15, 'bold'),justify=CENTER, state='normal')
             date_entry.configure(bg=primary)
@@ -675,7 +674,7 @@ class MainScreen:
                     for paragraph in cell.paragraphs:
                         for run in paragraph.runs:
                             run.font.size = Pt(10)
-                            run.font.color.rgb = RGBColor(0, 0, 0)  # Black font color
+                            run.font.color.rgb = RGBColor(1, 2, 0)  # Black font color
         doc = Document()
         table = doc.add_table(rows=2, cols=2)
         customize_table(table)
@@ -1034,9 +1033,7 @@ class MainScreen:
                         search_ttk['values'] = [''] + worker_names
 
                     except pymysql.err.DatabaseError as e:
-                        toastErrorCacher("no Interner Error",f"אירעה שגיאה בעת חיבור למסד הנתונים {e}")
-                    finally:
-                        pass
+                        messagebox.showerror("no Interner conniction",f"אירעה שגיאה בעת חיבור למסד הנתונים")
                 get_workers_names_Analysis()
 
                 def howMutchDays():

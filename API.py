@@ -3,8 +3,11 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
 app.logger.setLevel(logging.ERROR)
 
@@ -27,7 +30,6 @@ class Workers(db.Model):
 @app.route('/get', methods=['GET'])
 def get_api():
     try:
-        # Query all records from Workers table and order by workername
         workers_list = Workers.query.order_by(Workers.workername).all()
 
         data = [{
@@ -79,12 +81,12 @@ def post_api():
 @app.route('/update', methods=['PUT'])
 def update_api():
     try:
-        # Retrieve data from the request body
+        # get data from the request body
         data = request.get_json()
 
-        # Update data using parameterized query
+        # Update data 
         Row_id = data.get('Rowid')
-        worker = Workers.query.filter_by(Rowid=Row_id).first()  # Corrected column name
+        worker = Workers.query.filter_by(Rowid=Row_id).first()
         if worker:
             worker.hours = data.get('hours', worker.hours)
             worker.taken = data.get('taken', worker.taken)
@@ -92,8 +94,7 @@ def update_api():
             worker.address = data.get('address', worker.address)
             worker.managername = data.get('managername', worker.managername)
             worker.compname = data.get('compname', worker.compname)
-            # worker.date = data.get('date')
-            worker.worker_id = data.get('worker_id', worker.worker_id)  # Corrected assignment of worker_id
+            worker.worker_id = data.get('worker_id', worker.worker_id)
             worker.phone = data.get('phone', worker.phone)
             worker.workername = data.get('workername', worker.workername)
 
@@ -112,13 +113,10 @@ def update_api():
 @app.route('/delete/<int:Rowid>', methods=['DELETE'])
 def delete_api(Rowid):
     try:
-        # البحث عن العامل في قاعدة البيانات
         worker = Workers.query.get(Rowid)
         if worker:
-            # حذف العامل
             db.session.delete(worker)
             db.session.commit()
-
             return jsonify({'message': 'Data deleted successfully'}), 200
         else:
             return jsonify({'error': 'Worker not found'}), 404
