@@ -366,10 +366,10 @@ class MainScreen:
                         toastErrorCacher('שגיאה', f'הוספת נתונים נכשלה. קוד סטטוס: {response.status_code}')
 
             except requests.exceptions.RequestException as e:
-                # التعامل مع الأخطاء العامة في الطلبات (مثل مشاكل الشبكة)
+
                 toastErrorCacher('שגיאה', f'אירעה שגיאה: {e}')
             except Exception as e:
-                # التعامل مع أي استثناءات غير متوقعة
+
                 toastErrorCacher('שגיאה', f'אירעה שגיאה בלתי צפויה: {e}')
 
 # | פונקצית עדכון הנתונים |==
