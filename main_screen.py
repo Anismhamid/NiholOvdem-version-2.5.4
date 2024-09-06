@@ -297,12 +297,10 @@ class MainScreen:
             try:
                 # GET request to the API endpoint
                 response = requests.get('http://127.0.0.1:5000/get')
-                
                 # Verify the success of the request
                 if response.status_code == 200:
                     # Extract data into JSON format
                     data = response.json()
-                    
                     # Clear existing treeview data
                     workers_tuple.delete(*workers_tuple.get_children())
                     count=0
