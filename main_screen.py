@@ -28,12 +28,12 @@ mainFont = font='Heebo'
 
 #----------- database conniction -------------
 hostname1 = 'localhost'
-porta = 10017
+porta = 3306
 username1 ='root'
-passwd1 = 'root'
-database1='local'
+passwd1 = ''
+database1='workers'
 
-themes = ['flatly', 'cyborg', 'litera', 'minty', 'lumen', 'sandstone', 
+themes = ['','flatly', 'cyborg', 'litera', 'minty', 'lumen', 'sandstone', 
 'yeti', 'pulse', 'united', 'morph', 'journal', 'darkly', 
 'superhero', 'solar', 'cosmo', 'vapor', 'simplex', 'cerculean']
 
@@ -57,7 +57,7 @@ class MainScreen:
     def __init__(self):
         super().__init__()
         self.new_root = ctk.CTk()
-        self.new_root.geometry('996x760+320+20')
+        self.new_root.geometry('820x740+320+20')
         self.new_root.title('ניהול עוהדים, Develobed by °Anis Zkaria Mhamid°')
         self.new_root.config(bd=0)
         self.new_root.minsize(True,True)
@@ -70,7 +70,7 @@ class MainScreen:
 
             def exit_fullscreen(event):
                 self.new_root.attributes('-fullscreen', False)
-            
+
             self.new_root.bind('<Escape>', exit_fullscreen)
         self.new_root.bind('<F11>', fullscreen)
 
@@ -106,7 +106,8 @@ class MainScreen:
 
 # ============= | |  Header   | | ===================================
 
-        Header = cttk.Frame(self.new_root,height=29)
+        Header = Frame(self.new_root,height=29)
+        Header.configure(bg=primary)
         Header.pack(fill='x',pady=4)
         Header.pack_propagate(False)
 
@@ -186,9 +187,8 @@ class MainScreen:
 #======================= | |  צץ תצוגה   | | =============================
 
         style =cttk.Style()
-        style.theme_use(themes[0])
         def change_theme(event):
-            selected_theme = combobox.get()
+            selected_theme = styleCombobox.get()
             style.theme_use(selected_theme)
             style.configure("Treeview",
                 font=(mainFont, 10,
@@ -196,17 +196,17 @@ class MainScreen:
                     ),
                 rowheight=22)
 
-        combobox = cttk.Combobox(Header, values=themes,width=10,
+        styleCombobox = cttk.Combobox(Header, values=themes,width=20,height=2,
                         style="Custom.TCombobox",
                                         validate='all',
                                         state='readonly',
-                                        font=(mainFont,10),
+                                        font=(mainFont,8),
                                         justify='center')
-        combobox.place(x=200)
-        combobox.set(themes[0]) 
+        styleCombobox.place(x=200)
+        styleCombobox.set(themes[0]) 
 
         # Bind combobox selection to theme change function
-        combobox.bind('<<ComboboxSelected>>', change_theme)
+        styleCombobox.bind('<<ComboboxSelected>>', change_theme)
 
         # Set initial theme
         style.theme_use(themes[6])
@@ -333,16 +333,16 @@ class MainScreen:
         def post_api():
 
             data = {
-                'WORKERS_NAME_var': WORKERS_NAME_var.get(),
-                'WORKERS_PHONE_var': WORKERS_PHONE_var.get(),
-                'WORKERS_ID_var': WORKERS_ID_var.get(),
-                'WORKERS_COMPANY_NAME_var': WORKERS_COMPANY_NAME_var.get(),
-                'WORKERS_COMPANY_MANAGER_NAME_var': WORKERS_COMPANY_MANAGER_NAME_var.get(),
-                'WORKERS_WORK_ADDRESS_var': WORKERS_WORK_ADDRESS_var.get(),
-                'WORKERS_DATE_var': WORKERS_DATE_var.get(),
-                'WORKERS_WAGE_var': WORKERS_WAGE_var.get(),
-                'WORKERS_Taken_var': WORKERS_Taken_var.get(),
-                'WORKERS_Hours_Var': WORKERS_Hours_Var.get(),
+                'workername': WORKERS_NAME_var.get(),
+                'phone': WORKERS_PHONE_var.get(),
+                'worker_id': WORKERS_ID_var.get(),
+                'compname': WORKERS_COMPANY_NAME_var.get(),
+                'managername': WORKERS_COMPANY_MANAGER_NAME_var.get(),
+                'address': WORKERS_WORK_ADDRESS_var.get(),
+                'date': WORKERS_DATE_var.get(),
+                'wage': WORKERS_WAGE_var.get(),
+                'taken': WORKERS_Taken_var.get(),
+                'hours': WORKERS_Hours_Var.get(),
             }
 
             headers = {'mainContent-Type': 'application/json'}
@@ -966,7 +966,7 @@ class MainScreen:
 # ===================== | |  Buttons frame | | =======================================
 
 # ===================== | פרים כפתורים | =======================================
-            bottonFrame = Frame(f7,bd=3,relief='flat',bg='gray')
+            bottonFrame = Frame(f7,bd=10,relief='flat',bg='black')
             bottonFrame.pack(side='right',anchor='nw',fill='y')
 
 
@@ -993,7 +993,7 @@ class MainScreen:
 
 
             # ====================== | ניתוח נתונים |
-            
+
             # | פרים ניתוח נתונים | -----------------------------
             underprintFrame = cttk.Frame (f7)
             underprintFrame.pack(pady=0,fill='both',ipady=300)

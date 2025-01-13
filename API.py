@@ -9,7 +9,7 @@ from flasgger import Swagger, swag_from
 app = Flask(__name__)
 CORS(app)
 app.logger.setLevel(logging.ERROR)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost:10017/local'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root@localhost:3306/workers'
 db = SQLAlchemy(app)
 swagger = Swagger(app)
 
