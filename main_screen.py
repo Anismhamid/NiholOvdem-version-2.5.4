@@ -57,7 +57,7 @@ class MainScreen:
     def __init__(self):
         super().__init__()
         self.new_root = ctk.CTk()
-        self.new_root.geometry('820x740+320+20')
+        self.new_root.geometry('1080x820+320+20')
         self.new_root.title('ניהול עוהדים, Develobed by °Anis Zkaria Mhamid°')
         self.new_root.config(bd=0)
         self.new_root.minsize(True,True)
@@ -116,14 +116,14 @@ class MainScreen:
 
         # main label | ======
         def laBel(master,text,side='top'):
-            welcome_to_my_app =cttk.Label(master=master,text=text,font=(mainFont,16,'bold'))
+            welcome_to_my_app =cttk.Label(master=master,text=text,font=(mainFont,12,'bold'))
             welcome_to_my_app.pack(side=side)
         laBel(Header,'ניהול עובדים')
 
         # main Button  | | ==========
         def kaftor(text,command,master,side='top'):
             buttons = cttk.Button(master=master,default='active',text=text,command=command,cursor='hand2')
-            buttons.pack(side=side,pady=5,ipady=8,fill=X)
+            buttons.pack(side=side,pady=0,ipady=2,fill=X)
 #=====================================================================================================================
 
 
@@ -194,7 +194,7 @@ class MainScreen:
                 font=(mainFont, 10,
                     'normal'
                     ),
-                rowheight=22)
+                rowheight=25)
 
         styleCombobox = cttk.Combobox(Header, values=themes,width=20,height=2,
                         style="Custom.TCombobox",
@@ -217,7 +217,7 @@ class MainScreen:
                         foreground=dark,
                         fieldbackground='#D3D3D3',
                         font=(mainFont, 10, 'normal'),
-                        rowheight=22)
+                        rowheight=25)
 
         style.map('Treeview',
                 background=[('selected', '#0078D7')])
@@ -240,7 +240,7 @@ class MainScreen:
                 columns=('Rowid', "hours", 'taken', "wage", 'address', 'managername', 'compname', 'date', 'worker_id', 'phone', 'workername'),
                 yscrollcommand=vertical_scrollbar.set,
                 selectmode='extended', 
-                height=9
+                height=10
             )
             workers_treeview.pack(fill=cttk.BOTH, expand=True)
 
@@ -1103,7 +1103,6 @@ class MainScreen:
                     try:
                         connection = pymysql.connect(host=hostname1, user=username1, passwd=passwd1, port=porta,  database=database1)
                         cursor = connection.cursor()
-                        
                         selected_value = search_ttk.get()
 
                         query = f"""
@@ -1115,7 +1114,6 @@ class MainScreen:
 
                         cursor.execute(query)
                         results = cursor.fetchall()
-                        
                         if results:
                             global messageFormCompany
                             messageFormCompany = "פרטי החברות\n\n \n\nמספר ימי עבודה בכל חברה\n\n"
@@ -1125,7 +1123,6 @@ class MainScreen:
                                 days_worked = result[2]
                                 messageFormCompany += f"_______________________________________________\n\nשם חברה: {company_name}\n\n מזהה עובד: {workername}\n\nימים שעבד: {days_worked}\n\n"
                             cttk.dialogs.dialogs.Messagebox.ok(messageFormCompany, title=' ', alert=False, parent=None)
-                            # messagebox.showinfo("פרטי העבודה בחברות", message)
                         else:
                             messagebox.showinfo("ERROR", "אין נתונים להצגה")
                     except pymysql.err.DatabaseError as e:
@@ -1137,19 +1134,27 @@ class MainScreen:
                         conn = pymysql.connect(host=hostname1, port=porta, user=username1, passwd=passwd1, database=database1)
                         cursor = conn.cursor()
                         worker_name = search_ttk.get()
-                        query = f"SELECT workername, SUM(`hours`) AS total_wage FROM workers WHERE workername = '{worker_name}' GROUP BY workername"
+                        query = f"""
+                        SELECT ROUND(SUM(hours),2) AS total_hours
+                        FROM workers
+                        WHERE workername = '{worker_name}'
+                        """
                         cursor.execute(query)
                         res = cursor.fetchall()
-                        total_wage = res[0]
-                        if total_wage:
-                            messagebox.showinfo('שעות עבודה', f'ס"כ שעות עבודה: {total_wage}')
+
+                        if res and res[0][0] is not None:
+                            total_hours = res[0][0]
+                            cttk.dialogs.dialogs.Messagebox.ok(f"סה'כ שעות עבודה עבור: {worker_name}: {total_hours}", title='שעות עבודה', alert=True, parent=self.new_root)
                         else:
-                            messagebox.showinfo('אין תוצאות', 'לא נמצאו נתונים עבור העובד המבוקש')
+                            cttk.dialogs.dialogs.Messagebox.show_error('אין תוצאות', title='לא נמצאו נתונים עבור העובד המבוקש', alert=True, parent=self.new_root)
                     except Exception as e:
-                        toastErrorCacher('לא ניתן להתחבר לשרת MySQL',
-                                        f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}", 'danger')
+                        cttk.dialogs.dialogs.Messagebox.show_error('לא ניתן להתחבר לשרת MySQL',
+                            f"לא ניתן היה ליצור חיבור מכיוון שמכונת היעד סירבה לכך באופן פעיל. בדוק את חיבור האינטרנט שלך ונסה שנית. השגיאה היא: {e}", 'danger', alert=True, parent=self.new_root)
                     finally:
-                        pass
+                        if conn:
+                            conn.close()
+                        if cursor:
+                            cursor.close()
 
                 buttonsframe = Frame(master=calc_Days_Frame,relief='groove')
                 buttonsframe.config(bg=dark)
@@ -1165,8 +1170,8 @@ class MainScreen:
 
                         # Define the SQL query with parameter placeholder %s
                         query = """
-                            SELECT compname, workername, COUNT(*) AS total_days_worked 
-                            FROM workers 
+                            SELECT compname, workername, COUNT(*) AS total_days_worked
+                            FROM workers
                             WHERE workername = %s
                             GROUP BY compname, workername
                         """
